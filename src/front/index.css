@@ -1,0 +1,13 @@
+:root {
+  --color-primario: #480CA8;
+  --color-secundario: #7209B7;
+  
+  --color-alimentacion: #480CA8;
+  --color-descanso: #4CC9F0;
+  --color-cambio-pañal: #d65445;
+  --color-medicacion: #edd03e;
+  --color-tiempo-de-ejercicio: #57d23b;
+
+  --color-fondo: #f4f4f4;
+  --color-texto: #333333;
+}
