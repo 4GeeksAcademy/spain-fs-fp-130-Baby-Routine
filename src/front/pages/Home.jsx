@@ -4,27 +4,25 @@ export const Home = () => {
   return (
     <div className="bg-registro">
       <div className="container d-flex justify-content-center align-items-center min-vh-100">
-        
-        {/* Card principal con overflow hidden para que el header respete el redondeo */}
+
+        {/* Card principal */}
         <div className="card shadow-sm border-0" style={{ maxWidth: "450px", width: "100%", borderRadius: "20px", overflow: "hidden" }}>
-          
-          {/* Header Centrado con posición relativa */}
-          <div className="d-flex align-items-center justify-content-center p-3  position-relative" 
-               style={{ backgroundColor: "var(--color-primario)", minHeight: "80px" }}>
-            
-            {/* Logo centrado */}
-            <img 
-              src={logoApp} 
-              alt="Logo Baby Zzzync" 
-              style={{ width: "150px", height: "auto" }} 
+          <div className="d-flex align-items-center justify-content-center p-3  position-relative"
+            style={{ backgroundColor: "var(--color-primario)", minHeight: "80px" }}>
+
+            {/* Logo */}
+            <img
+              src={logoApp}
+              alt="Logo Baby Zzzync"
+              style={{ width: "150px", height: "auto" }}
             />
-            {/* Icono de menú de hamburguesa (usando FontAwesome si lo tienes, o un emoji si no) */}
+            {/* Icono de menú */}
             <i className="fas fa-bars fa-lg text-muted" style={{ cursor: "pointer" }}></i>
           </div>
 
           {/* Menú de Botones */}
           <div className="d-flex flex-column gap-4 p-4">
-            
+
             {/* Botón 1: MI FAMILIA */}
             <button className="btn w-100 p-4 text-center border shadow-sm" style={btnStyle}>
               <i className="fas fa-users mb-2" style={iconStyle}></i>
@@ -47,17 +45,14 @@ export const Home = () => {
             </button>
 
           </div>
-
-        
-
         </div>
       </div>
-      
+
     </div>
   );
 };
 
-// Estilos sencillos en línea para que no tengas que tocar el CSS
+// Estilos sencillos en línea, problemas hablados en la reunion del 04/04
 const cardStyle = {
   backgroundColor: "white",
   borderRadius: "15px",
@@ -71,15 +66,15 @@ const cardStyle = {
 };
 
 const btnStyle = {
-    backgroundColor: "var(--color-fondoBotones)", // Usa tu variable de CSS
-    borderRadius: "15px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    border: "none", // Sin bordes para un look más limpio
-    transition: "all 0.2s ease"
-  };
+  backgroundColor: "var(--color-fondoBotones)",
+  borderRadius: "15px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  border: "none",
+  transition: "all 0.2s ease"
+};
 
 const iconStyle = {
   fontSize: "1.5rem",

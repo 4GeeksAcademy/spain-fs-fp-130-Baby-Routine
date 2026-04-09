@@ -5,22 +5,22 @@ export const Registro = () => {
   return (
     /* Contenedor principal */
     <div className="bg-registro">
-      
+
       <div className="container d-flex justify-content-center align-items-center min-vh-100 py-4">
-        
+
         {/* Tarjeta de Registro blanca */}
         <div className="card p-4 shadow-sm border-0" style={{ maxWidth: "400px", width: "100%", borderRadius: "20px" }}>
-          
+
           {/* Logo y Encabezado */}
           <div className="text-center mb-3">
-            <img 
-              src={logoApp} 
-              alt="Logo Baby Zzzync" 
-              style={{ width: "190px", height: "auto", marginBottom: "1px" }} 
+            <img
+              src={logoApp}
+              alt="Logo Baby Zzzync"
+              style={{ width: "190px", height: "auto", marginBottom: "1px" }}
             />
           </div>
 
-          {/* Sección Foto Perfil */}
+          {/* Foto de Perfil */}
           <div className="profile-circle mb-4">
             <i className="fas fa-plus mb-1"></i>
             <span className="small fw-bold">FOTO</span>
@@ -60,35 +60,23 @@ export const Registro = () => {
               <input type="number" className="form-control input-line" placeholder="EDAD" />
             </div>
 
-            {/* Selección de Género */}
-            <div className="d-flex justify-content-center gap-4 my-4">
-              <div className="form-check">
-                <input className="form-check-input" type="radio" name="gender" id="m" />
-                <label className="form-check-label small fw-bold" htmlFor="m">MASCULINO</label>
-              </div>
-              <div className="form-check">
-                <input className="form-check-input" type="radio" name="gender" id="f" />
-                <label className="form-check-label small fw-bold" htmlFor="f">FEMENINO</label>
-              </div>
-            </div>
-
             {/* Botón de Acción */}
-           <button 
-  type="submit" 
-  className="btn w-100 py-2 mt-2" 
-  style={{ 
-    backgroundColor: "var(--color-primario)", 
-    color: "white", 
-    borderRadius: "50px",
-    border: "none" 
-  }}
->
-  Crear Cuenta
-</button>
+            <button
+              type="submit"
+              className="btn w-100 py-2 mt-2"
+              style={{
+                backgroundColor: "var(--color-primario)",
+                color: "white",
+                borderRadius: "50px",
+                border: "none"
+              }}
+            >
+              Crear Cuenta
+            </button>
           </form>
         </div>
       </div>
-      
+
     </div>
   );
 };
