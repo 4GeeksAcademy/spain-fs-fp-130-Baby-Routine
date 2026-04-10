@@ -1,5 +1,6 @@
 import React from "react";
 import logoApp from "../assets/Logo Baby Zzync 1.png";
+import Cloudinary from "../components/Cloudinary";
 
 export const Registro = () => {
   return (
@@ -21,9 +22,8 @@ export const Registro = () => {
           </div>
 
           {/* Foto de Perfil */}
-          <div className="profile-circle mb-4">
-            <i className="fas fa-plus mb-1"></i>
-            <span className="small fw-bold">FOTO</span>
+          <div className="profile-circle mb-4 text-center">
+            <Cloudinary />
           </div>
 
           {/* Formulario de Registro */}
