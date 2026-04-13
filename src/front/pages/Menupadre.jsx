@@ -1,6 +1,7 @@
 import React from "react";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 import { Carduser } from "../components/Carduser.jsx";
+import { Link } from "react-router-dom";
 
 export const Menupadre = () => {
   return (
@@ -29,24 +30,24 @@ export const Menupadre = () => {
               </div>
             </div>
 
-            {/* Botón Añadir hijo */}
-            <div className="text-center mt-auto">
-              <button 
-                className="btn shadow-sm" 
-                style={{ 
-                  backgroundColor: "var(--color-descanso)", 
-                  color: "white", 
-                  borderRadius: "12px", 
-                  fontWeight: "600",
-                  border: "none",
-                  padding: "8px 25px",
-                  fontSize: "0.9rem",
-                  transition: "all 0.3s ease"
-                }}
-              >
-                Añadir hijo
-              </button>
-            </div>
+   <div className="text-center mt-auto"> 
+  <Link to="/addhijo" style={{ textDecoration: "none" }}>
+    <button 
+      className="btn shadow-sm" 
+      style={{ 
+        backgroundColor: "var(--color-descanso)", 
+        color: "white", 
+        borderRadius: "12px", 
+        fontWeight: "600",
+        border: "none",
+        padding: "8px 25px",
+        fontSize: "0.9rem"
+      }}
+    >
+      Añadir hijo
+    </button>
+  </Link>
+</div>
 
           </div>
         </div>
