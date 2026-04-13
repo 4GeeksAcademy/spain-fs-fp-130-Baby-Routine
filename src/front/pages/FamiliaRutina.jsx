@@ -43,14 +43,26 @@ export const FamiliaRutina = () => {
     };
 
     const toggleComplete = (indexId) => {
-        const temporal = list.map(item => {
-            if (item.id === indexId) {
-                return { ...item, completed: !item.completed };
+    
+    let listaNueva = [];
+
+    
+    for (let i = 0; i < list.length; i++) {
+        let elemento = list[i];
+        if (elemento.id === indexId) {
+            if (elemento.completed === true) {
+                elemento.completed = false;
+            } else {
+                elemento.completed = true;
             }
-            return item;
-        });
-        setList(temporal);
-    };
+        }
+        
+        
+        listaNueva.push(elemento);
+    }
+
+    setList(listaNueva);
+};
 
     
 
