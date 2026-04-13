@@ -24,7 +24,7 @@ export const Carduser = () => {
   );
 };
 
-// Estilo para el círculo de la foto
+// Dibujo input foto
 const photoPlaceholderStyle = {
   width: "65px",
   height: "65px",
