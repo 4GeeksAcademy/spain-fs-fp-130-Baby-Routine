@@ -13,15 +13,19 @@ export const AddAutorizado = () => {
   const [apellidos, setApellidos] = useState(""); 
   const [telefono, setTelefono] = useState("");
   const [dni, setDni] = useState(""); 
+  const [direccion, setDireccion] = useState(""); // <-- NUEVO ESTADO
   const [parentesco, setParentesco] = useState("");
+  const [foto, setFoto] = useState(null);
+  
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaFin, setFechaFin] = useState("");
 
   const handleSave = () => {
-    // Validación básica de campos obligatorios
-    if (!nombre || !apellidos || !telefono || !dni) {
-      return alert("Por favor, rellena Nombre, Apellidos, Teléfono y DNI.");
+    // Validación básica
+    if (!nombre || !apellidos || !telefono || !dni || !fechaInicio || !fechaFin) {
+      return alert("Por favor, rellena los datos obligatorios y el periodo de autorización.");
     }
 
-    // Enviamos el nuevo autorizado al Store Global
     dispatch({
       type: "add_autorizado",
       payload: { 
@@ -30,21 +34,20 @@ export const AddAutorizado = () => {
         apellidos,
         telefono, 
         dni,
+        direccion, // <-- ENVIAMOS LA DIRECCIÓN AL STORE
         parentesco,
-        fotoUrl: null 
+        fotoUrl: foto,
+        validoDesde: fechaInicio,
+        validoHasta: fechaFin
       }
     });
 
-    // Volvemos al menú principal
     navigate("/menupadre");
   };
 
   return (
-    
     <div className="bg-registro min-vh-100 d-flex align-items-center justify-content-center p-3">
-      
-        <div className="card shadow-sm border-0" style={{ maxWidth: "450px", width: "100%", borderRadius: "20px" }}>
-        
+      <div className="card shadow-sm border-0" style={{ maxWidth: "450px", width: "100%", borderRadius: "20px" }}>
         
         <div className="d-flex align-items-center justify-content-center p-3 position-relative" 
              style={{ backgroundColor: "var(--color-primario)", borderRadius: "20px 20px 0 0" }}>
@@ -54,16 +57,14 @@ export const AddAutorizado = () => {
           </Link>
         </div>
 
-        {/* FORMULARIO */}
         <div className="card-body p-4 d-flex flex-column gap-3">
           
           <Cloudinary onImageUploaded={(url) => setFoto(url)} />
 
-          <div className="text-center mb-3">
+          <div className="text-center mb-1">
             <p className="text-muted small m-0">Persona delegada para recoger a tu hijo/a</p>
           </div>
 
-          {/* Inputs */}
           <input 
             type="text" 
             className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
@@ -85,6 +86,14 @@ export const AddAutorizado = () => {
             onChange={(e) => setDni(e.target.value)} 
             style={{ fontSize: "0.9rem" }}
           />
+          {/* NUEVO INPUT DE DIRECCIÓN */}
+          <input 
+            type="text" 
+            className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
+            placeholder="Dirección completa" 
+            onChange={(e) => setDireccion(e.target.value)} 
+            style={{ fontSize: "0.9rem" }}
+          />
           <input 
             type="tel" 
             className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
@@ -100,8 +109,31 @@ export const AddAutorizado = () => {
             style={{ fontSize: "0.9rem" }}
           />
 
-          {/* BOTONES DE ACCIÓN */}
-          <div className="d-flex gap-2 mt-4">
+          <div className="row g-2">
+            <div className="col-12 mt-2 text-center">
+              <p className="small text-muted mb-1 fw-bold">Periodo de validez de autorización:</p>
+            </div>
+            <div className="col-6 text-center">
+              <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Desde:</label>
+              <input 
+                type="date" 
+                className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
+                onChange={(e) => setFechaInicio(e.target.value)}
+                style={{ fontSize: "0.85rem" }}
+              />
+            </div>
+            <div className="col-6 text-center">
+              <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Hasta:</label>
+              <input 
+                type="date" 
+                className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
+                onChange={(e) => setFechaFin(e.target.value)}
+                style={{ fontSize: "0.85rem" }}
+              />
+            </div>
+          </div>
+
+          <div className="d-flex gap-2 mt-3">
             <Link to="/menupadre" className="btn btn-light rounded-pill flex-grow-1 p-3 shadow-sm" style={{ fontSize: "0.9rem", color: "#666" }}>
               Cancelar
             </Link>

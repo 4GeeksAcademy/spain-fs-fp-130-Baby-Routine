@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { Cardhijo } from "../components/Cardhijo.jsx";
 import { Carduser } from "../components/Carduser.jsx";
+import { Cardautorizado } from "../components/Cardautorizado.jsx";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 
 export const Menupadre = () => {
@@ -19,31 +20,48 @@ export const Menupadre = () => {
         </div>
 
         <div className="card-body p-4 d-flex flex-column">
+          {/* Información general del perfil */}
           <Carduser />
           
-          <Link to="/add-autorizado" style={{ textDecoration: 'none' }}>
-  <button 
-    className="btn text-white fw-bold shadow-sm" 
-    style={{ 
-      backgroundColor: "var(--color-fondoBotones)", 
-      borderRadius: "20px", 
-      padding: "5px 15px",  
-      fontSize: "0.8rem",   
-      border: "none"
-    }}
-  >
-    Añadir Autorizado
-  </button>
-</Link>
+          {/* Seccion de autorizados */}
+          <div className="d-flex justify-content-between align-items-center mt-2">
+            <Link to="/add-autorizado" style={{ textDecoration: 'none' }}>
+              <button 
+                className="btn text-white fw-bold shadow-sm" 
+                style={{ 
+                  backgroundColor: "var(--color-fondoBotones)", 
+                  borderRadius: "20px", 
+                  padding: "5px 15px",   
+                  fontSize: "0.8rem",   
+                  border: "none"
+                }}
+              >
+                Añadir Autorizado
+              </button>
+            </Link>
+          </div>
 
-          {/* Grilla de los Hijos */}
-          <div className="row g-3 mt-2 overflow-auto" style={{ maxHeight: "300px" }}>
+          {/* Listado de Autorizados */}
+          <div className="mt-2 overflow-auto" style={{ maxHeight: "150px" }}>
+            {store.autorizados && store.autorizados.length > 0 ? (
+              store.autorizados.map(autorizado => (
+                <Cardautorizado key={autorizado.id} autorizado={autorizado} />
+              ))
+            ) : (
+              <p className="text-muted small ps-2 mt-1" style={{ fontSize: "0.75rem" }}>No hay autorizados registrados.</p>
+            )}
+          </div>
+
+          <hr className="my-3 opacity-25" />
+
+          {/* Sección de los Hijos */}
+          <div className="row g-3 overflow-auto" style={{ maxHeight: "250px" }}>
             {store.hijos && store.hijos.length > 0 ? (
               store.hijos.map(hijo => (
                 <Cardhijo key={hijo.id} hijo={hijo} />
               ))
             ) : (
-              <div className="text-center mt-5 text-muted">
+              <div className="text-center mt-4 text-muted">
                 <p className="small italic">No hay hijos registrados. Pulsa el botón de abajo para empezar.</p>
               </div>
             )}
@@ -55,7 +73,6 @@ export const Menupadre = () => {
               <button className="btn px-5 text-white fw-bold shadow-sm" style={{ backgroundColor: "var(--color-descanso)", borderRadius: "12px", padding: "10px" }}>
                 Añadir hijo
               </button>
-              
             </Link>
           </div>
         </div>
