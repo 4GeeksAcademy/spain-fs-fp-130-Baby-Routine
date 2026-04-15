@@ -11,15 +11,27 @@
 }
 
 .bg-registro {
-  background-color: var(--color-fondo); 
-  min-height: 100vh; /* Esto asegura que el color cubra toda la altura de la pantalla */
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    background-color: var(--color-fondo);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
-/* Estilos de inputs */
+.mobile-container {
+  max-width: 420px;
+  width: 100%;
+  background-color: white;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
 .input-line {
   border: none !important;
   border-bottom: 1px solid #ccc !important;
@@ -28,7 +40,11 @@
   background-color: transparent !important;
 }
 
-
+.profile-wrapper {
+  position: relative;
+  width: 100px;
+  margin: 0 auto;
+}
 
 .profile-circle {
   width: 100px;
@@ -39,8 +55,62 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 0 auto;
   color: var(--color-primario);
-  overflow: hidden;             /* Ayuda del día 09/04, reunión de la mañana*/
+  overflow: hidden;
   padding: 0;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.photo-menu {
+  position: absolute;
+  top: 105px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  width: 140px;
+  overflow: hidden;
+}
+
+.photo-menu button {
+  background: none;
+  border: none;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+  color: var(--color-primario);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.photo-menu button:hover {
+  background-color: var(--color-fondoBotones);
+}
+
+.mobile-container {
+    max-width: 420px;
+    width: 100%;
+    height: 85vh;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 30px;
+    overflow-y: auto; 
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-container::-webkit-scrollbar {
+    width: 4px;
+}
+.mobile-container::-webkit-scrollbar-thumb {
+    background: var(--color-fondoBotones);
+    border-radius: 10px;
 }
