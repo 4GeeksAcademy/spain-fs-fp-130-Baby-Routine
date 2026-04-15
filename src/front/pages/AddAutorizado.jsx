@@ -104,7 +104,7 @@ export const AddAutorizado = () => {
           <input 
             type="text" 
             className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
-            placeholder="Parentesco (Opcional, ej: Abuelo)" 
+            placeholder="Parentesco (ej: Abuelo)" 
             onChange={(e) => setParentesco(e.target.value)} 
             style={{ fontSize: "0.9rem" }}
           />
