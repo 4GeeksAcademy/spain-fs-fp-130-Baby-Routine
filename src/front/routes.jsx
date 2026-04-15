@@ -14,6 +14,7 @@ import { Login } from "./pages/Login";
 import { FamiliaRutina } from "./pages/FamiliaRutina";
 import { Menupadre } from "./pages/Menupadre";
 import { Addhijo } from "./pages/Addhijo.jsx";
+import { AddAutorizado } from "./pages/AddAutorizado.jsx";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -36,6 +37,7 @@ export const router = createBrowserRouter(
         <Route path="/familia" element={<FamiliaRutina />} />
         <Route path="/Menupadre" element={<Menupadre />} />
         <Route element={<Addhijo />} path="/addhijo" />
+        <Route path="/add-autorizado" element={<AddAutorizado />} />
 
       </Route>
     )
