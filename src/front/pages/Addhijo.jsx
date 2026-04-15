@@ -1,69 +1,103 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
+import Cloudinary from "../components/Cloudinary.jsx";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
-import Cloudinary from "../components/Cloudinary.jsx"; 
 
-export const Addhijo = () => {
-  const [edad, setEdad] = useState("");
-  const [urlFoto, setUrlFoto] = useState(""); 
+export const Addhijo = () => {  
+  const { dispatch } = useGlobalReducer();
+  const navigate = useNavigate();
 
   
-  const handleImageUpload = (url) => {
-    setUrlFoto(url); 
-    console.log("Imagen lista para guardar en la DB:", url);
+  const [nombre, setNombre] = useState("");
+  const [apellidos, setApellidos] = useState("");
+  const [edad, setEdad] = useState(0);
+  const [info, setInfo] = useState("");
+  const [foto, setFoto] = useState("");
+
+  
+  const handleSave = () => {
+    if (!nombre || !foto) {
+      alert("Por favor, introduce al menos el nombre y la foto.");
+      return;
+    }
+
+    // Enviamos la acción al store global
+    dispatch({
+      type: "add_hijo",
+      payload: {
+        id: Date.now(), // ID temporal único
+        nombre: nombre,
+        apellidos: apellidos,
+        edad: edad,
+        info: info,
+        fotoUrl: foto
+      }
+    });
+
+    // Volvemos a la vista del padre
+    navigate("/menupadre");
   };
 
-  const sumarEdad = () => setEdad(prev => (prev === "" ? 1 : parseInt(prev) + 1));
-  const restarEdad = () => setEdad(prev => (prev > 0 ? parseInt(prev) - 1 : 0));
-
   return (
-    <div className="bg-registro">
-      <div className="container d-flex justify-content-center align-items-center min-vh-100">
-        <div className="card shadow-sm border-0" style={{ maxWidth: "450px", width: "100%", borderRadius: "20px", overflow: "hidden" }}>
+    <div className="bg-registro min-vh-100 d-flex align-items-center justify-content-center py-4">
+      <div className="card shadow border-0" style={{ maxWidth: "420px", width: "90%", borderRadius: "25px" }}>
+        
+        {/* Header */}
+        <div className="p-3 text-center position-relative" style={{ backgroundColor: "var(--color-primario)", borderRadius: "25px 25px 0 0" }}>
+          <Link to="/menupadre" className="position-absolute text-white" style={{ left: "20px", top: "25px" }}>
+            <i className="fas fa-arrow-left fa-lg"></i>
+          </Link>
+          <img src={logoApp} style={{ width: "130px" }} alt="logo" />
+        </div>
+
+        <div className="card-body p-4 text-center">
+          {/* Componente Cloudinary funcional */}
+          <Cloudinary onImageUploaded={(url) => setFoto(url)} />
           
-          <div className="d-flex align-items-center justify-content-center p-3 position-relative"
-            style={{ backgroundColor: "var(--color-primario)", minHeight: "80px" }}>
-            <Link to="/menupadre" className="position-absolute" style={{ left: "20px", color: "white" }}>
-               <i className="fas fa-arrow-left fa-lg"></i>
-            </Link>
-            <img src={logoApp} alt="Logo" style={{ width: "150px", height: "auto" }} />
-          </div>
-
-          <div className="card-body p-4 text-center">
+          <div className="mt-4 d-flex flex-column gap-2">
+            <input 
+              type="text" 
+              className="form-control text-center rounded-pill shadow-sm" 
+              placeholder="nombre" 
+              onChange={e => setNombre(e.target.value)} 
+            />
+            <input 
+              type="text" 
+              className="form-control text-center rounded-pill shadow-sm" 
+              placeholder="apellidos" 
+              onChange={e => setApellidos(e.target.value)} 
+            />
             
-            {/* Cloudinary */}
-            <div className="mb-4 d-flex justify-content-center">
-                <Cloudinary onImageUploaded={handleImageUpload} />
+            {/* Selector de Edad */}
+            <div className="input-group rounded-pill overflow-hidden border shadow-sm">
+              <button className="btn btn-light border-0" onClick={() => setEdad(Math.max(0, edad - 1))}>
+                <i className="fas fa-minus small text-muted"></i>
+              </button>
+              <input 
+                type="number" 
+                className="form-control text-center border-0 bg-light no-spinners" 
+                value={edad} 
+                readOnly 
+              />
+              <button className="btn btn-light border-0" onClick={() => setEdad(edad + 1)}>
+                <i className="fas fa-plus small text-muted"></i>
+              </button>
             </div>
 
-          {/* inputs */} 
-            <div className="d-flex flex-column gap-2 mb-4">
-              <input type="text" className="form-control text-center shadow-sm" placeholder="nombre" style={inputStyle} />
-              <input type="text" className="form-control text-center shadow-sm" placeholder="apellidos" style={inputStyle} />
-              
-          {/* Edad */}     
-              <div className="input-group shadow-sm" style={{ borderRadius: "20px", overflow: "hidden", border: "1px solid #ced4da" }}>
-                <button className="btn btn-light border-0" type="button" onClick={restarEdad} style={{ width: "50px" }}>
-                  <i className="fas fa-minus text-muted"></i>
-                </button>
-                <input 
-                  type="number" 
-                  className="form-control text-center border-0 no-spinners" 
-                  placeholder="EDAD" 
-                  value={edad}
-                  onChange={(e) => setEdad(e.target.value)}
-                  style={{ fontSize: "0.95rem", backgroundColor: "#f9f9f9" }} 
-                />
-                <button className="btn btn-light border-0" type="button" onClick={sumarEdad} style={{ width: "50px" }}>
-                  <i className="fas fa-plus text-muted"></i>
-                </button>
-              </div>
-              
-              {/* input informacion */} 
-              <textarea className="form-control text-center shadow-sm mt-2" placeholder="Informacion" style={{ ...inputStyle, borderRadius: "15px", height: "100px" }} />
-            </div>
-
-            <button className="btn shadow-sm" style={btnSubmitStyle}>
+            <textarea 
+              className="form-control text-center mt-2 shadow-sm" 
+              placeholder="Información" 
+              style={{ borderRadius: "15px", height: "80px" }} 
+              onChange={e => setInfo(e.target.value)} 
+            />
+            
+            {/* Botón */}
+            <button 
+              className="btn w-100 mt-3 text-white fw-bold shadow-sm" 
+              onClick={handleSave} 
+              style={{ backgroundColor: "var(--color-descanso)", borderRadius: "12px", padding: "12px" }}
+            >
               AÑADIR HIJO
             </button>
           </div>

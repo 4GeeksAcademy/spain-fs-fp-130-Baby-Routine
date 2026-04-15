@@ -1,35 +1,46 @@
 import React from "react";
 
-export const Carduser = () => {
+export const Carduser = () => {  
+  const userData = {
+    nombre: "Usuario Padre",
+    fotoUrl: null // Aqui iria la url de la imagen
+  };
+
   return (
-    <div className="d-flex align-items-center justify-content-between p-3 mb-4 border" 
-         style={{ borderRadius: "20px", backgroundColor: "#fbfbfb" }}>
+    <div className="d-flex align-items-center p-2 mb-4 shadow-sm" 
+         style={{ borderRadius: "50px", backgroundColor: "#fbfbfb", border: "1px solid #eee" }}>
       
-      {/* Información del Usuario */}
-      <div className="flex-grow-1">
-        <p className="m-0 text-muted">Nombre:</p>
-        <p className="m-0 text-muted">Apellidos:</p>
-        <p className="m-0 text-muted">Edad:</p>
+      {/* Avatar del Usuario */}
+      <div className="d-flex align-items-center justify-content-center shadow-sm" 
+           style={avatarStyle}>
+        {userData.fotoUrl ? (
+          <img src={userData.fotoUrl} alt="User" style={imgStyle} />
+        ) : (
+          <i className="fas fa-user text-white" style={{ fontSize: "1.1rem" }}></i>
+        )}
       </div>
 
-      {/* Placeholder de Foto */}
-      <div className="d-flex align-items-center justify-content-center border" 
-           style={photoPlaceholderStyle}>
-        <i className="fas fa-user text-muted" style={{ fontSize: "1.2rem" }}></i>
-        <span className="text-center text-muted mt-1" style={{ fontSize: "0.65rem", lineHeight: "1" }}>
-          FOTO<br/>USER
-        </span>
+      {/* Nombre del Usuario */}
+      <div className="ms-3">
+        <p className="m-0 fw-bold" style={{ color: "#555", fontSize: "1rem" }}>
+          {userData.nombre}
+        </p>
+        <p className="m-0 text-muted" style={{ fontSize: "0.75rem", marginTop: "-3px" }}>
+          @UsuarioPadre
+        </p>
       </div>
+
     </div>
   );
 };
 
-// Dibujo input foto
-const photoPlaceholderStyle = {
-  width: "65px",
-  height: "65px",
+// Estilos del contenedor del avatar
+const avatarStyle = {
+  width: "50px",
+  height: "50px",
   borderRadius: "50%",
-  backgroundColor: "var(--color-fondoBotones)",
-  flexDirection: "column",
-  display: "flex"
+  backgroundColor: "var(--color-primario)", 
+  overflow: "hidden",
+  flexShrink: 0
 };
+
