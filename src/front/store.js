@@ -1,7 +1,8 @@
 export const initialStore = () => {
   return {
     message: null,
-    hijos: [], // Lista global de hijos
+    hijos: [], 
+    autorizados: [], 
     todos: [
       { id: 1, title: "Make the bed", background: null },
       { id: 2, title: "Do my homework", background: null }
@@ -17,17 +18,30 @@ export default function storeReducer(store, action = {}) {
         hijos: [...store.hijos, action.payload]
       };
 
-    // CASO PARA ELIMINAR
+    // CASO PARA ELIMINAR HIJO
     case 'delete_hijo':
       return {
         ...store,
-        // Filtramos lista: se quedan todos menos el que coincida con el ID
         hijos: store.hijos.filter((hijo) => hijo.id !== action.payload)
       };
+
+    // CASOS PARA AUTORIZADOS
+    case 'add_autorizado':
+      return {
+        ...store,
+        autorizados: [...store.autorizados, action.payload]
+      };
+
+    case 'delete_autorizado':
+      return {
+        ...store,
+        autorizados: store.autorizados.filter((auth) => auth.id !== action.payload)
+      };
     
+
     case 'set_hello':
       return { ...store, message: action.payload };
-      
+
     case 'add_task':
       const { id, color } = action.payload;
       return {

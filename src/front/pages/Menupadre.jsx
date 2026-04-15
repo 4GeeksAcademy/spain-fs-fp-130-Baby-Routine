@@ -21,6 +21,21 @@ export const Menupadre = () => {
         <div className="card-body p-4 d-flex flex-column">
           <Carduser />
           
+          <Link to="/add-autorizado" style={{ textDecoration: 'none' }}>
+  <button 
+    className="btn text-white fw-bold shadow-sm" 
+    style={{ 
+      backgroundColor: "var(--color-fondoBotones)", 
+      borderRadius: "20px", 
+      padding: "5px 15px",  
+      fontSize: "0.8rem",   
+      border: "none"
+    }}
+  >
+    Añadir Autorizado
+  </button>
+</Link>
+
           {/* Grilla de los Hijos */}
           <div className="row g-3 mt-2 overflow-auto" style={{ maxHeight: "300px" }}>
             {store.hijos && store.hijos.length > 0 ? (
@@ -40,6 +55,7 @@ export const Menupadre = () => {
               <button className="btn px-5 text-white fw-bold shadow-sm" style={{ backgroundColor: "var(--color-descanso)", borderRadius: "12px", padding: "10px" }}>
                 Añadir hijo
               </button>
+              
             </Link>
           </div>
         </div>
