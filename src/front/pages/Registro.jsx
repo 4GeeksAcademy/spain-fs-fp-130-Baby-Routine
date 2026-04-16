@@ -2,22 +2,83 @@ import React, { useState } from "react";
 import logoApp from "../assets/Logo Baby Zzync 1.png";
 import { Link, useNavigate } from "react-router-dom";
 import Cloudinary from "../components/Cloudinary";
+import Autocomplete from "react-google-autocomplete";
 
 export const Registro = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [validated, setValidated] = useState(false);
+  
   const [formData, setFormData] = useState({
     email: "", password: "", confirmPassword: "", nombre: "", apellidos: "",
     edad: "", direccionHogar: "", direccionTrabajo: "", prefijo: "+34",
     telefono: "", fotoPerfil: ""
   });
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "telefono") {
+      const onlyNums = value.replace(/[^0-9]/g, "");
+      setFormData({ ...formData, [name]: onlyNums });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
   const handleImageUploaded = (url) => setFormData({ ...formData, fotoPerfil: url });
+
+  const handleHogarSelect = (place) => {
+    setFormData({ ...formData, direccionHogar: place.formatted_address });
+  };
+
+  const handleTrabajoSelect = (place) => {
+    setFormData({ ...formData, direccionTrabajo: place.formatted_address });
+  };
 
   const passwordsMatch = formData.password === formData.confirmPassword;
   const showMatchError = formData.confirmPassword.length > 0 && !passwordsMatch;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setValidated(true);
+
+    if (!formData.fotoPerfil) return;
+
+    if (!passwordsMatch) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+
+    const dataToSend = {
+      ...formData,
+      telefonoCompleto: `${formData.prefijo} ${formData.telefono}`
+    };
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/registro`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (response.ok) {
+        setShowModal(true);
+      } else {
+        const data = await response.json();
+        alert(data.msg || "Error al registrar la cuenta");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error de conexión con el servidor");
+    }
+  };
+
+  const handleConfirmar = () => {
+    setShowModal(false);
+    navigate("/");
+  };
 
   return (
     <div className="bg-registro">
@@ -25,19 +86,33 @@ export const Registro = () => {
         <div className="text-center mb-3">
           <img src={logoApp} alt="Logo" style={{ width: "180px" }} />
         </div>
+        
         <div className="mb-4 text-center">
           <Cloudinary onImageUploaded={handleImageUploaded} />
+          {validated && !formData.fotoPerfil && (
+            <small className="text-danger d-block mt-1">Campo Obligatorio</small>
+          )}
         </div>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <div className="d-flex align-items-center mb-3">
-            <i className="fas fa-envelope me-3 text-muted" style={{ width: "20px" }}></i>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} className="form-control input-line" placeholder="CORREO ELECTRÓNICO" />
+        
+        <form onSubmit={handleSubmit} noValidate>
+          
+          <div className="mb-3">
+            <div className="d-flex align-items-center">
+              <i className="fas fa-envelope me-3 text-muted" style={{ width: "20px" }}></i>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} className="form-control input-line" placeholder="CORREO ELECTRÓNICO" required />
+            </div>
+            {validated && !formData.email && <small className="text-danger ms-5">Campo Obligatorio</small>}
           </div>
-          <div className="d-flex align-items-center mb-3">
-            <i className="fas fa-lock me-3 text-muted" style={{ width: "20px" }}></i>
-            <input type={showPassword ? "text" : "password"} name="password" value={formData.password} onChange={handleChange} className="form-control input-line" placeholder="CONTRASEÑA" />
-            <i className={`fas ${showPassword ? 'fa-eye' : 'fa-eye-slash'} ms-2`} onClick={() => setShowPassword(!showPassword)} style={{cursor:"pointer", color:"var(--color-descanso)"}}></i>
+          
+          <div className="mb-3">
+            <div className="d-flex align-items-center">
+              <i className="fas fa-lock me-3 text-muted" style={{ width: "20px" }}></i>
+              <input type={showPassword ? "text" : "password"} name="password" value={formData.password} onChange={handleChange} className="form-control input-line" placeholder="CONTRASEÑA" required />
+              <i className={`fas ${showPassword ? 'fa-eye' : 'fa-eye-slash'} ms-2`} onClick={() => setShowPassword(!showPassword)} style={{cursor:"pointer", color:"var(--color-descanso)"}}></i>
+            </div>
+            {validated && !formData.password && <small className="text-danger ms-5">Campo Obligatorio</small>}
           </div>
+          
           <div className="mb-3">
             <div className="d-flex align-items-center">
               <i className="fas fa-lock me-3 text-muted" style={{ width: "20px" }}></i>
@@ -49,47 +124,107 @@ export const Registro = () => {
                 className="form-control input-line" 
                 placeholder="CONFIRMAR CONTRASEÑA" 
                 style={{ borderBottom: showMatchError ? "1px solid red" : "1px solid #ccc" }}
+                required
               />
               <i className={`fas ${showConfirmPassword ? 'fa-eye' : 'fa-eye-slash'} ms-2`} onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{cursor:"pointer", color:"var(--color-descanso)"}}></i>
             </div>
             {showMatchError && <small className="text-danger d-block mt-1" style={{ marginLeft: "38px" }}>Las contraseñas no coinciden</small>}
           </div>
-          {/* Conservamos todos los campos */}
-          <div className="d-flex align-items-center mb-3">
-            <i className="fas fa-id-card me-3 text-muted" style={{ width: "20px" }}></i>
-            <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} className="form-control input-line" placeholder="NOMBRE" />
+          
+          <div className="mb-3">
+            <div className="d-flex align-items-center">
+              <i className="fas fa-id-card me-3 text-muted" style={{ width: "20px" }}></i>
+              <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} className="form-control input-line" placeholder="NOMBRE" required />
+            </div>
+            {validated && !formData.nombre && <small className="text-danger ms-5">Campo Obligatorio</small>}
           </div>
-          <div className="d-flex align-items-center mb-3">
-            <i className="fas fa-users me-3 text-muted" style={{ width: "20px" }}></i>
-            <input type="text" name="apellidos" value={formData.apellidos} onChange={handleChange} className="form-control input-line" placeholder="APELLIDOS" />
+          
+          <div className="mb-3">
+            <div className="d-flex align-items-center">
+              <i className="fas fa-users me-3 text-muted" style={{ width: "20px" }}></i>
+              <input type="text" name="apellidos" value={formData.apellidos} onChange={handleChange} className="form-control input-line" placeholder="APELLIDOS" required />
+            </div>
+            {validated && !formData.apellidos && <small className="text-danger ms-5">Campo Obligatorio</small>}
           </div>
-          <div className="d-flex align-items-center mb-3">
-            <i className="fas fa-calendar me-3 text-muted" style={{ width: "20px" }}></i>
-            <input type="number" name="edad" value={formData.edad} onChange={handleChange} className="form-control input-line" placeholder="EDAD" />
+          
+          <div className="mb-3">
+            <div className="d-flex align-items-center">
+              <i className="fas fa-calendar me-3 text-muted" style={{ width: "20px" }}></i>
+              <input type="number" name="edad" value={formData.edad} onChange={handleChange} className="form-control input-line" placeholder="EDAD" required />
+            </div>
+            {validated && !formData.edad && <small className="text-danger ms-5">Campo Obligatorio</small>}
           </div>
+
           <div className="d-flex align-items-center mb-3">
             <i className="fas fa-home me-3 text-muted" style={{ width: "20px" }}></i>
-            <input type="text" name="direccionHogar" value={formData.direccionHogar} onChange={handleChange} className="form-control input-line" placeholder="DIRECCIÓN DEL HOGAR" />
+            <Autocomplete
+              apiKey="AIzaSyAIjEtDE9DT_aJdXjy9uC2NMdzUKhtOjOU"
+              onPlaceSelected={handleHogarSelect}
+              onChange={(e) => setFormData({ ...formData, direccionHogar: e.target.value })}
+              className="form-control input-line"
+              placeholder="DIRECCIÓN DEL HOGAR"
+              options={{ types: ["address"] }}
+              defaultValue={formData.direccionHogar}
+              required
+            />
           </div>
+
           <div className="d-flex align-items-center mb-3">
             <i className="fas fa-building me-3 text-muted" style={{ width: "20px" }}></i>
-            <input type="text" name="direccionTrabajo" value={formData.direccionTrabajo} onChange={handleChange} className="form-control input-line" placeholder="DIRECCIÓN DEL TRABAJO" />
+            <Autocomplete
+              apiKey="AIzaSyAIjEtDE9DT_aJdXjy9uC2NMdzUKhtOjOU"
+              onPlaceSelected={handleTrabajoSelect}
+              onChange={(e) => setFormData({ ...formData, direccionTrabajo: e.target.value })}
+              className="form-control input-line"
+              placeholder="DIRECCIÓN DEL TRABAJO"
+              options={{ types: ["address"] }}
+              defaultValue={formData.direccionTrabajo}
+            />
           </div>
-          <div className="d-flex align-items-center mb-4">
-            <i className="fas fa-phone me-3 text-muted" style={{ width: "20px" }}></i>
-            <select name="prefijo" value={formData.prefijo} onChange={handleChange} className="form-control input-line me-2" style={{ maxWidth: "85px" }}>
-              <option value="+34">🇪🇸 +34</option>
-              <option value="+52">🇲🇽 +52</option>
-              <option value="+1">🇺🇸 +1</option>
-            </select>
-            <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} className="form-control input-line w-100" placeholder="TELÉFONO" />
+
+          <div className="mb-4">
+            <div className="d-flex align-items-center">
+              <i className="fas fa-phone me-3 text-muted" style={{ width: "20px" }}></i>
+              <select name="prefijo" value={formData.prefijo} onChange={handleChange} className="form-control input-line me-2" style={{ maxWidth: "85px" }}>
+                <option value="+34">🇪🇸 +34</option>
+                <option value="+52">🇲🇽 +52</option>
+                <option value="+1">🇺🇸 +1</option>
+              </select>
+              <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} className="form-control input-line w-100" placeholder="TELÉFONO DE CONTACTO" required />
+            </div>
+            {validated && !formData.telefono && <small className="text-danger ms-5">Campo Obligatorio</small>}
           </div>
+          
           <div className="mb-3 text-center">
             <Link to="/" className="small text-decoration-none fw-bold" style={{ color: "var(--color-descanso)" }}>¿Ya tienes una cuenta?</Link>
           </div>
+          
           <button type="submit" className="btn w-100 py-2 mt-2 mb-4" style={{ backgroundColor: "var(--color-primario)", color: "white", borderRadius: "50px", border: "none" }}>Crear Cuenta</button>
         </form>
       </div>
+
+      {showModal && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
+          backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", 
+          alignItems: "center", zIndex: 1000, padding: "20px"
+        }}>
+          <div style={{
+            backgroundColor: "white", padding: "30px", borderRadius: "20px", 
+            textAlign: "center", maxWidth: "400px", width: "100%", boxShadow: "0 4px 15px rgba(0,0,0,0.2)"
+          }}>
+            <i className="fas fa-check-circle mb-3" style={{ fontSize: "50px", color: "var(--color-primario)" }}></i>
+            <h4 className="fw-bold mb-3">La cuenta ha sido creada con éxito</h4>
+            <button 
+              onClick={handleConfirmar}
+              className="btn w-100 py-2" 
+              style={{ backgroundColor: "var(--color-primario)", color: "white", borderRadius: "50px", border: "none" }}
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -24,5 +24,4 @@ class User(db.Model):
             "email": self.email,
             "nombre": self.nombre,
             "foto_perfil": self.foto_perfil
-            # No serializamos el password por seguridad
         }
