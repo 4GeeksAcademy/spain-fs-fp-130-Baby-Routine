@@ -26,7 +26,7 @@ export const Home = () => {
         </div>
 
         <div className="d-flex flex-column gap-4 p-4">
-          <Link to="/familia" style={{ textDecoration: "none" }}> 
+          <Link to="/Menupadre" style={{ textDecoration: "none" }}> 
             <button className="btn w-100 p-4 shadow-sm" style={btnStyle}>
               <i className="fas fa-users mb-2" style={iconStyle}></i>
               <h5 className="m-0 fw-bold text-dark">MI FAMILIA</h5>
