@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png"; 
 import Cloudinary from "../components/Cloudinary.jsx";
+import Swal from 'sweetalert2';
 
 export const AddAutorizado = () => {
   const { dispatch } = useGlobalReducer();
@@ -13,37 +14,59 @@ export const AddAutorizado = () => {
   const [apellidos, setApellidos] = useState(""); 
   const [telefono, setTelefono] = useState("");
   const [dni, setDni] = useState(""); 
-  const [direccion, setDireccion] = useState(""); // <-- NUEVO ESTADO
+  const [direccion, setDireccion] = useState(""); 
   const [parentesco, setParentesco] = useState("");
   const [foto, setFoto] = useState(null);
   
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
 
-  const handleSave = () => {
-    // Validación básica
+const handleSave = () => {
     if (!nombre || !apellidos || !telefono || !dni || !fechaInicio || !fechaFin) {
-      return alert("Por favor, rellena los datos obligatorios y el periodo de autorización.");
+        Swal.fire({
+            title: '¡Faltan datos!',
+            text: 'Rellena los campos obligatorios.',
+            icon: 'warning',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: 'var(--color-primario)',
+            width: '400px', 
+            padding: '1.5rem',
+            customClass: {
+                popup: 'my-custom-popup', 
+                title: 'fw-bold fs-5',
+                confirmButton: 'rounded-pill px-4 shadow-sm'
+            }
+        });
+        return;
     }
 
+    
     dispatch({
-      type: "add_autorizado",
-      payload: { 
-        id: Date.now(), 
-        nombre, 
-        apellidos,
-        telefono, 
-        dni,
-        direccion, // <-- ENVIAMOS LA DIRECCIÓN AL STORE
-        parentesco,
-        fotoUrl: foto,
-        validoDesde: fechaInicio,
-        validoHasta: fechaFin
-      }
+        type: "add_autorizado",
+        payload: { 
+            id: Date.now(), 
+            nombre, apellidos, telefono, dni, direccion, parentesco,
+            fotoUrl: foto,
+            validoDesde: fechaInicio,
+            validoHasta: fechaFin
+        }
     });
 
-    navigate("/menupadre");
-  };
+    // Exito
+    Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: '¡Autorizado!',
+        showConfirmButton: false,
+        timer: 1500,
+        width: '400px', 
+        customClass: {
+            popup: 'my-custom-popup'
+        }
+    }).then(() => {
+        navigate("/menupadre");
+    });
+};
 
   return (
     <div className="bg-registro min-vh-100 d-flex align-items-center justify-content-center p-3">
@@ -86,7 +109,7 @@ export const AddAutorizado = () => {
             onChange={(e) => setDni(e.target.value)} 
             style={{ fontSize: "0.9rem" }}
           />
-          {/* NUEVO INPUT DE DIRECCIÓN */}
+          {/* INPUT DE DIRECCIÓN */}
           <input 
             type="text" 
             className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 

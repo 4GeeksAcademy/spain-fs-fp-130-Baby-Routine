@@ -126,3 +126,12 @@
 .no-spinners[type=number] {
   -moz-appearance: textfield;
 }
+
+
+/* ajustar bordes de alerta */
+.my-custom-popup {
+    border-radius: 30px !important; 
+    font-family: 'Montserrat', sans-serif; 
+}
+
+
