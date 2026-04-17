@@ -21,6 +21,13 @@ export const AddAutorizado = () => {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
 
+  const handleTelefonoChange = (e) => {
+  const value = e.target.value;
+  // solo permite números del 0 al 9
+  const onlyNums = value.replace(/[^0-9]/g, '');
+  setTelefono(onlyNums);
+};
+
 const handleSave = () => {
     if (!nombre || !apellidos || !telefono || !dni || !fechaInicio || !fechaFin) {
         Swal.fire({
@@ -39,7 +46,7 @@ const handleSave = () => {
         });
         return;
     }
-
+    
     
     dispatch({
         type: "add_autorizado",
@@ -118,19 +125,37 @@ const handleSave = () => {
             style={{ fontSize: "0.9rem" }}
           />
           <input 
-            type="tel" 
-            className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
-            placeholder="Teléfono de contacto" 
-            onChange={(e) => setTelefono(e.target.value)} 
-            style={{ fontSize: "0.9rem" }}
-          />
-          <input 
-            type="text" 
-            className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
-            placeholder="Parentesco (ej: Abuelo)" 
-            onChange={(e) => setParentesco(e.target.value)} 
-            style={{ fontSize: "0.9rem" }}
-          />
+  type="tel" 
+  className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
+  placeholder="Teléfono de contacto"
+  value={telefono} 
+  onChange={handleTelefonoChange} 
+  maxLength="9" 
+  style={{ fontSize: "0.9rem" }}
+/>
+          {/* Dropdown de Parentesco */}
+<select 
+  className="form-select rounded-pill border-0 bg-light p-3 shadow-inner" 
+  value={parentesco} 
+  onChange={(e) => setParentesco(e.target.value)}
+  style={{ 
+    fontSize: "0.9rem", 
+    color: parentesco === "" ? "#6c757d" : "#212529", // Cambia color si hay selección
+    appearance: "none", // Limpia estilos nativos si fuera necesario
+    backgroundImage: "url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Cpath fill=%22none%22 stroke=%22%23666%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M2 5l6 6 6-6%22/%3E%3C/svg%3E')",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 1.25rem center",
+    backgroundSize: "16px 12px"
+  }}
+>
+  <option value="" disabled>Selecciona el parentesco</option>
+  <option value="Progenitor">Progenitor</option>
+  <option value="Abuelo/a">Abuelo/a</option>
+  <option value="Hermano/a">Hermano/a</option>
+  <option value="Primo/a">Primo/a</option>
+  <option value="Tío/a">Tío/a</option>
+  <option value="Amigo/a">Amigo/a</option>
+</select>
 
           <div className="row g-2">
             <div className="col-12 mt-2 text-center">
