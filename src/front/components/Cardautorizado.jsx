@@ -1,18 +1,50 @@
 import React from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import Swal from 'sweetalert2';
 
 export const Cardautorizado = ({ autorizado }) => {
   const { dispatch } = useGlobalReducer();
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    if (window.confirm(`¿Seguro que quieres eliminar la autorización de ${autorizado.nombre}?`)) {
+const handleDelete = (e) => {
+  e.stopPropagation();
+
+  // Alerta de confirmacion, con el estilo actualizado
+  Swal.fire({
+    title: '¿Eliminar?',
+    text: `Se borrará la autorización de ${autorizado.nombre}.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: 'var(--color-descanso)', 
+    cancelButtonColor: '#c2c2c2',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    width: '400px', 
+    customClass: {
+      popup: 'my-custom-popup', 
+      confirmButton: 'rounded-pill px-3 shadow-sm',
+      cancelButton: 'rounded-pill px-3'
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
       dispatch({
         type: "delete_autorizado",
         payload: autorizado.id
       });
+
+      
+      Swal.fire({
+        title: 'Eliminado',
+        icon: 'success',
+        timer: 1000,
+        showConfirmButton: false,
+        width: '280px',
+        customClass: {
+          popup: 'my-custom-popup'
+        }
+      });
     }
-  };
+  });
+};
 
   return (
     <div className="col-12 mb-2">
@@ -129,7 +161,7 @@ export const Cardautorizado = ({ autorizado }) => {
             </div>
           </div>
         </div>
-        {/* --- FIN MODAL --- */}
+        {/* FIN MODAL */}
         
       </div>
     </div>

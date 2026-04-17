@@ -1,20 +1,50 @@
 import React from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer"; 
+import Swal from 'sweetalert2';
 
 export const Cardhijo = ({ hijo }) => {
   const { dispatch } = useGlobalReducer();
 
-  const handleDelete = (e) => {    
-    e.stopPropagation();
+const handleDelete = (e) => {
+  e.stopPropagation(); 
 
-    // Confirmación para eliminar 
-    if (window.confirm(`¿Seguro que quieres eliminar el perfil de ${hijo.nombre}?`)) {
+  Swal.fire({
+    title: '¿Eliminar a ' + hijo.nombre + '?',
+    text: "Esta acción no se puede deshacer.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: 'var(--color-descanso)', 
+    cancelButtonColor: '#c2c2c2',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar',
+    width: '400px', 
+    padding: '1.5rem',
+    customClass: {
+      popup: 'my-custom-popup', 
+      confirmButton: 'rounded-pill px-3 shadow-sm',
+      cancelButton: 'rounded-pill px-3'
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {      
       dispatch({
         type: "delete_hijo",
-        payload: hijo.id 
+        payload: hijo.id
+      });
+
+      // confirmacion de eliminado
+      Swal.fire({
+        title: '¡Eliminado!',
+        icon: 'success',
+        timer: 1000,
+        showConfirmButton: false,
+        width: '400px',
+        customClass: {
+          popup: 'my-custom-popup'
+        }
       });
     }
-  };
+  });
+};
 
   return (
     <div className="col-6">
@@ -95,48 +125,48 @@ export const Cardhijo = ({ hijo }) => {
         </div>
 
         {/* MODAL DE INFORMACIÓN */}
-        <div className="modal fade" id={`modalInfo-${hijo.id}`} tabIndex="-1" aria-hidden="true">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content" style={{ borderRadius: "25px", border: "none" }}>
-              
-                           
-              <div className="modal-body text-center pt-5">
-                <img 
-                  src={hijo.fotoUrl} 
-                  alt={hijo.nombre} 
-                  className="shadow-sm mb-3"
-                  style={{ width: "110px", height: "110px", borderRadius: "50%", objectFit: "cover", border: "4px solid #f8f9fa" }}
-                />
-                <h3 className="fw-bold mb-1" style={{ color: "#333" }}>{hijo.nombre}</h3>
-                <p className="text-muted mb-3" style={{ fontSize: "1.1rem" }}>{hijo.apellidos}</p>
-                
-                <div className="d-flex justify-content-center mb-3">
-                    <span className="badge rounded-pill px-3 py-2" style={{ backgroundColor: "#e9ecef", color: "#495057" }}>
-                        {hijo.edad} años
-                    </span>
-                </div>
-
-                <div className="px-4 py-3 bg-light mx-3" style={{ borderRadius: "15px" }}>
-                  <p className="small text-uppercase fw-bold text-muted mb-2">Notas adicionales</p>
-                  <p className="mb-0" style={{ color: "#555" }}>
-                    {hijo.info || "Sin información adicional."}
-                  </p>
-                </div>
-              </div>
-
-              <div className="modal-footer border-0 justify-content-center pb-4">
-                <button 
-                    type="button" 
-                    className="btn px-5 py-2 text-white shadow-sm" 
-                    data-bs-dismiss="modal" 
-                    style={{ backgroundColor: "var(--color-primario)", borderRadius: "12px", border: "none" }}
-                >
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          </div>
+<div className="modal fade" id={`modalInfo-${hijo.id}`} tabIndex="-1" aria-hidden="true">
+  {/* Ajuste de tamañodel modal */}
+  <div className="modal-dialog modal-dialog-centered modal-sm">
+    <div className="modal-content" style={{ borderRadius: "25px", border: "none" }}>
+      
+      <div className="modal-body text-center pt-5">
+        <img 
+          src={hijo.fotoUrl} 
+          alt={hijo.nombre} 
+          className="shadow-sm mb-3"
+          style={{ width: "110px", height: "110px", borderRadius: "50%", objectFit: "cover", border: "4px solid #f8f9fa" }}
+        />
+        <h3 className="fw-bold mb-1" style={{ color: "#333" }}>{hijo.nombre}</h3>
+        <p className="text-muted mb-3" style={{ fontSize: "1.1rem" }}>{hijo.apellidos}</p>
+        
+        <div className="d-flex justify-content-center mb-3">
+          <span className="badge rounded-pill px-3 py-2" style={{ backgroundColor: "#e9ecef", color: "#495057" }}>
+            {hijo.edad} años
+          </span>
         </div>
+
+        <div className="px-4 py-3 bg-light mx-2" style={{ borderRadius: "15px" }}>
+          <p className="small text-uppercase fw-bold text-muted mb-2" style={{ fontSize: "0.7rem" }}>Notas adicionales</p>
+          <p className="mb-0" style={{ color: "#555", fontSize: "0.9rem" }}>
+            {hijo.info || "Sin información adicional."}
+          </p>
+        </div>
+      </div>
+
+      <div className="modal-footer border-0 justify-content-center pb-4">
+        <button 
+          type="button" 
+          className="btn px-5 py-2 text-white shadow-sm" 
+          data-bs-dismiss="modal" 
+          style={{ backgroundColor: "var(--color-primario)", borderRadius: "12px", border: "none" }}
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
         {/* hasta aqui el MODAL*/}
 
       </div>
