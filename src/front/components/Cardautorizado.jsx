@@ -1,17 +1,48 @@
 import React from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import Swal from 'sweetalert2';
 
 export const Cardautorizado = ({ autorizado }) => {
   const { dispatch } = useGlobalReducer();
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    if (window.confirm(`¿Seguro que quieres eliminar la autorización de ${autorizado.nombre}?`)) {
-      dispatch({
-        type: "delete_autorizado",
-        payload: autorizado.id
-      });
-    }
+
+    // Alerta de confirmacion, con el estilo actualizado
+    Swal.fire({
+      title: '¿Eliminar?',
+      text: `Se borrará la autorización de ${autorizado.nombre}.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: 'var(--color-descanso)', 
+      cancelButtonColor: '#c2c2c2',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      width: '400px', 
+      customClass: {
+        popup: 'my-custom-popup', 
+        confirmButton: 'rounded-pill px-3 shadow-sm',
+        cancelButton: 'rounded-pill px-3'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch({
+          type: "delete_autorizado",
+          payload: autorizado.id
+        });
+
+        Swal.fire({
+          title: 'Eliminado',
+          icon: 'success',
+          timer: 1000,
+          showConfirmButton: false,
+          width: '280px',
+          customClass: {
+            popup: 'my-custom-popup'
+          }
+        });
+      }
+    });
   };
 
   return (
@@ -46,9 +77,10 @@ export const Cardautorizado = ({ autorizado }) => {
             </h6>
             <p className="mb-1 text-muted" style={{ fontSize: "0.75rem" }}>
               {autorizado.parentesco || "Autorizado"}
+              {autorizado.esPermanente && <span className="ms-2 badge rounded-pill bg-success-subtle text-success border border-success-subtle" style={{fontSize: "0.6rem"}}>Permanente</span>}
             </p>
             
-            {/* BOTÓN INFO */}
+            {/* BOTON INFO */}
             <button 
               className="btn btn-sm p-0 d-flex align-items-center" 
               data-bs-toggle="modal" 
@@ -60,7 +92,7 @@ export const Cardautorizado = ({ autorizado }) => {
           </div>
         </div>
 
-        {/* MODAL DE INFORMACIÓN */}
+        {/* MODAL DE INFORMACION */}
         <div className="modal fade" id={`modalAuth-${autorizado.id}`} tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-dialog-centered modal-sm">
             <div className="modal-content" style={{ borderRadius: "20px", border: "none" }}>
@@ -102,19 +134,28 @@ export const Cardautorizado = ({ autorizado }) => {
                         <span style={{ color: "#444", fontSize: "0.85rem" }}>{autorizado.parentesco || "Autorizado"}</span>
                     </div>
 
-                    {/* RANGO DE FECHAS */}
+                    {/* RANGO DE FECHAS O PERMANENCIA */}
                     <div className="bg-light p-2 rounded-3 mt-3 shadow-sm border">
                         <label className="text-muted d-block text-center mb-1" style={{ fontSize: "0.6rem", fontWeight: "bold", textTransform: "uppercase" }}>Validez del Permiso</label>
-                        <div className="d-flex justify-content-between px-2">
-                            <div className="text-center">
-                                <small className="d-block text-muted" style={{fontSize: "0.55rem"}}>Desde</small>
-                                <small className="fw-bold text-success" style={{ fontSize: "0.75rem" }}>{autorizado.validoDesde}</small>
-                            </div>
-                            <div className="text-center border-start ps-2">
-                                <small className="d-block text-muted" style={{fontSize: "0.55rem"}}>Hasta</small>
-                                <small className="fw-bold text-danger" style={{ fontSize: "0.75rem" }}>{autorizado.validoHasta}</small>
-                            </div>
-                        </div>
+                        
+                        {autorizado.esPermanente ? (
+                          <div className="text-center py-1">
+                            <span className="badge rounded-pill bg-success text-white px-3" style={{ fontSize: "0.7rem" }}>
+                              <i className="fas fa-infinity me-1"></i> ACCESO PERMANENTE
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="d-flex justify-content-between px-2">
+                              <div className="text-center">
+                                  <small className="d-block text-muted" style={{fontSize: "0.55rem"}}>Desde</small>
+                                  <small className="fw-bold text-success" style={{ fontSize: "0.75rem" }}>{autorizado.validoDesde}</small>
+                              </div>
+                              <div className="text-center border-start ps-2">
+                                  <small className="d-block text-muted" style={{fontSize: "0.55rem"}}>Hasta</small>
+                                  <small className="fw-bold text-danger" style={{ fontSize: "0.75rem" }}>{autorizado.validoHasta}</small>
+                              </div>
+                          </div>
+                        )}
                     </div>
                 </div>
 
@@ -129,7 +170,7 @@ export const Cardautorizado = ({ autorizado }) => {
             </div>
           </div>
         </div>
-        {/* --- FIN MODAL --- */}
+        {/* FIN MODAL */}
         
       </div>
     </div>

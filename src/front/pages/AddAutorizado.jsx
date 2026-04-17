@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png"; 
 import Cloudinary from "../components/Cloudinary.jsx";
+import Swal from 'sweetalert2';
 
 export const AddAutorizado = () => {
   const { dispatch } = useGlobalReducer();
@@ -13,36 +14,67 @@ export const AddAutorizado = () => {
   const [apellidos, setApellidos] = useState(""); 
   const [telefono, setTelefono] = useState("");
   const [dni, setDni] = useState(""); 
-  const [direccion, setDireccion] = useState(""); // <-- NUEVO ESTADO
+  const [direccion, setDireccion] = useState(""); 
   const [parentesco, setParentesco] = useState("");
   const [foto, setFoto] = useState(null);
   
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
+  const [esPermanente, setEsPermanente] = useState(false); 
+
+  const handleTelefonoChange = (e) => {
+    const value = e.target.value;
+    const onlyNums = value.replace(/[^0-9]/g, '');
+    setTelefono(onlyNums);
+  };
 
   const handleSave = () => {
-    // Validación básica
-    if (!nombre || !apellidos || !telefono || !dni || !fechaInicio || !fechaFin) {
-      return alert("Por favor, rellena los datos obligatorios y el periodo de autorización.");
-    }
+    // Validacion: si es permanente las fechas no son necesarias
+    const fechasValidas = esPermanente ? true : (fechaInicio && fechaFin);
 
+    if (!nombre || !apellidos || !telefono || !dni || !parentesco || !fechasValidas) {
+        Swal.fire({
+            title: '¡Faltan datos!',
+            text: 'Rellena los campos obligatorios.',
+            icon: 'warning',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: 'var(--color-primario)',
+            width: '400px', 
+            padding: '1.5rem',
+            customClass: {
+                popup: 'my-custom-popup', 
+                title: 'fw-bold fs-5',
+                confirmButton: 'rounded-pill px-4 shadow-sm'
+            }
+        });
+        return;
+    }
+    
     dispatch({
-      type: "add_autorizado",
-      payload: { 
-        id: Date.now(), 
-        nombre, 
-        apellidos,
-        telefono, 
-        dni,
-        direccion, // <-- ENVIAMOS LA DIRECCIÓN AL STORE
-        parentesco,
-        fotoUrl: foto,
-        validoDesde: fechaInicio,
-        validoHasta: fechaFin
-      }
+        type: "add_autorizado",
+        payload: { 
+            id: Date.now(), 
+            nombre, apellidos, telefono, dni, direccion, parentesco,
+            fotoUrl: foto,
+            esPermanente, 
+            validoDesde: esPermanente ? "Permanente" : fechaInicio,
+            validoHasta: esPermanente ? "Indefinido" : fechaFin
+        }
     });
 
-    navigate("/menupadre");
+    Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: '¡Autorizado!',
+        showConfirmButton: false,
+        timer: 1500,
+        width: '400px', 
+        customClass: {
+            popup: 'my-custom-popup'
+        }
+    }).then(() => {
+        navigate("/menupadre");
+    });
   };
 
   return (
@@ -86,7 +118,6 @@ export const AddAutorizado = () => {
             onChange={(e) => setDni(e.target.value)} 
             style={{ fontSize: "0.9rem" }}
           />
-          {/* NUEVO INPUT DE DIRECCIÓN */}
           <input 
             type="text" 
             className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
@@ -97,27 +128,61 @@ export const AddAutorizado = () => {
           <input 
             type="tel" 
             className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
-            placeholder="Teléfono de contacto" 
-            onChange={(e) => setTelefono(e.target.value)} 
-            style={{ fontSize: "0.9rem" }}
-          />
-          <input 
-            type="text" 
-            className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
-            placeholder="Parentesco (ej: Abuelo)" 
-            onChange={(e) => setParentesco(e.target.value)} 
+            placeholder="Teléfono de contacto"
+            value={telefono} 
+            onChange={handleTelefonoChange} 
+            maxLength="9" 
             style={{ fontSize: "0.9rem" }}
           />
 
-          <div className="row g-2">
-            <div className="col-12 mt-2 text-center">
-              <p className="small text-muted mb-1 fw-bold">Periodo de validez de autorización:</p>
+          <select 
+            className="form-select rounded-pill border-0 bg-light p-3 shadow-inner" 
+            value={parentesco} 
+            onChange={(e) => setParentesco(e.target.value)}
+            style={{ 
+                fontSize: "0.9rem", 
+                color: parentesco === "" ? "#6c757d" : "#212529",
+                backgroundImage: "url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Cpath fill=%22none%22 stroke=%22%23666%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M2 5l6 6 6-6%22/%3E%3C/svg%3E')",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "right 1.25rem center",
+                backgroundSize: "16px 12px"
+            }}
+          >
+            <option value="" disabled>Selecciona el parentesco</option>
+            <option value="Progenitor">Progenitor</option>
+            <option value="Abuelo/a">Abuelo/a</option>
+            <option value="Hermano/a">Hermano/a</option>
+            <option value="Primo/a">Primo/a</option>
+            <option value="Tío/a">Tío/a</option>
+            <option value="Amigo/a">Amigo/a</option>
+          </select>
+
+          {/* OPCION PERMANENTE */}
+          <div className="d-flex justify-content-between align-items-center px-3 mt-2">
+            <label className="small fw-bold text-muted">¿Autorización permanente?</label>
+            <div className="form-check form-switch">
+              <input 
+                className="form-check-input" 
+                type="checkbox" 
+                role="switch" 
+                checked={esPermanente}
+                onChange={(e) => setEsPermanente(e.target.checked)}
+                style={{ cursor: "pointer", transform: "scale(1.2)" }}
+              />
+            </div>
+          </div>
+
+          {/* FECHAS (Se deshabilitan si es permanente) */}
+          <div className={`row g-2 ${esPermanente ? "opacity-50" : ""}`} style={{ transition: "0.3s" }}>
+            <div className="col-12 text-center">
+              <p className="small text-muted mb-1 fw-bold">Periodo de validez:</p>
             </div>
             <div className="col-6 text-center">
               <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Desde:</label>
               <input 
                 type="date" 
                 className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
+                disabled={esPermanente}
                 onChange={(e) => setFechaInicio(e.target.value)}
                 style={{ fontSize: "0.85rem" }}
               />
@@ -127,6 +192,7 @@ export const AddAutorizado = () => {
               <input 
                 type="date" 
                 className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
+                disabled={esPermanente}
                 onChange={(e) => setFechaFin(e.target.value)}
                 style={{ fontSize: "0.85rem" }}
               />

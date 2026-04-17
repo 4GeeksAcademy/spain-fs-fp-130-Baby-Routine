@@ -3,41 +3,63 @@ import { useNavigate, Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import Cloudinary from "../components/Cloudinary.jsx";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
+import Swal from 'sweetalert2';
 
 export const Addhijo = () => {  
   const { dispatch } = useGlobalReducer();
   const navigate = useNavigate();
 
-  
   const [nombre, setNombre] = useState("");
   const [apellidos, setApellidos] = useState("");
   const [edad, setEdad] = useState(0);
   const [info, setInfo] = useState("");
   const [foto, setFoto] = useState("");
 
-  
   const handleSave = () => {
-    if (!nombre || !foto) {
-      alert("Por favor, introduce al menos el nombre y la foto.");
-      return;
+    if (!nombre || !apellidos || edad === 0) {
+        Swal.fire({
+            title: '¡Ups!',
+            text: 'Por favor, rellena el nombre, apellidos y selecciona una edad.',
+            icon: 'warning',
+            confirmButtonText: 'Corregir',
+            confirmButtonColor: 'var(--color-primario)',
+            width: '400px',
+            padding: '1.2rem',
+            customClass: {
+                popup: 'my-custom-popup',
+                confirmButton: 'rounded-pill px-4 shadow-sm'
+            }
+        });
+        return;
     }
 
-    // Enviamos la acción al store global
+    
     dispatch({
-      type: "add_hijo",
-      payload: {
-        id: Date.now(), // ID temporal único
-        nombre: nombre,
-        apellidos: apellidos,
-        edad: edad,
-        info: info,
-        fotoUrl: foto
-      }
+        type: "add_hijo",
+        payload: { 
+            id: Date.now(), 
+            nombre, 
+            apellido: apellidos, 
+            edad,
+            info,
+            fotoUrl: foto 
+        }
     });
 
-    // Volvemos a la vista del padre
-    navigate("/menupadre");
-  };
+    
+    Swal.fire({
+        icon: 'success',
+        title: '¡Niño registrado!',
+        showConfirmButton: false,
+        timer: 1500,
+        width: '400px',
+        customClass: {
+            popup: 'my-custom-popup'
+        }
+    }).then(() => {
+        navigate("/menupadre");
+    });
+};
 
   return (
     <div className="bg-registro min-vh-100 d-flex align-items-center justify-content-center py-4">
@@ -52,24 +74,26 @@ export const Addhijo = () => {
         </div>
 
         <div className="card-body p-4 text-center">
-          {/* Componente Cloudinary funcional */}
           <Cloudinary onImageUploaded={(url) => setFoto(url)} />
           
           <div className="mt-4 d-flex flex-column gap-2">
             <input 
               type="text" 
               className="form-control text-center rounded-pill shadow-sm" 
-              placeholder="nombre" 
+              placeholder="Nombre" 
+              value={nombre}
               onChange={e => setNombre(e.target.value)} 
             />
             <input 
               type="text" 
               className="form-control text-center rounded-pill shadow-sm" 
-              placeholder="apellidos" 
+              placeholder="Apellidos" 
+              value={apellidos}
               onChange={e => setApellidos(e.target.value)} 
             />
             
             {/* Selector de Edad */}
+            <label className="small text-muted mt-2">Edad de tu peque</label>
             <div className="input-group rounded-pill overflow-hidden border shadow-sm">
               <button className="btn btn-light border-0" onClick={() => setEdad(Math.max(0, edad - 1))}>
                 <i className="fas fa-minus small text-muted"></i>
@@ -87,12 +111,12 @@ export const Addhijo = () => {
 
             <textarea 
               className="form-control text-center mt-2 shadow-sm" 
-              placeholder="Información" 
+              placeholder="Información relevante (Alergias, notas...)" 
               style={{ borderRadius: "15px", height: "80px" }} 
+              value={info}
               onChange={e => setInfo(e.target.value)} 
             />
             
-            {/* Botón */}
             <button 
               className="btn w-100 mt-3 text-white fw-bold shadow-sm" 
               onClick={handleSave} 
