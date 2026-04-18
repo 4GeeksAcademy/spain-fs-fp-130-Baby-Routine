@@ -15,8 +15,15 @@ export const Login = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
       });
-      if (response.ok) navigate("/home");
-      else alert("Correo o contraseña incorrectos");
+
+      if (response.ok) {
+        const data = await response.json();
+        // GUARDAMOS EL USUARIO EN LOCALSTORAGE
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate("/home");
+      } else {
+        alert("Correo o contraseña incorrectos");
+      }
     } catch (error) {
       alert("No se pudo conectar con el servidor.");
     }
@@ -44,17 +51,6 @@ export const Login = () => {
                 ¿No estás registrado?
               </Link>
             </div>
-
-            <p className="small text-muted mb-2">Continuar con:</p>
-            <div className="d-flex gap-2 mb-4">
-              <button type="button" className="btn btn-outline-primary flex-grow-1">
-                <i className="fab fa-facebook-f me-2"></i>Facebook
-              </button>
-              <button type="button" className="btn btn-outline-dark px-4">
-                <i className="fab fa-apple"></i>
-              </button>
-            </div>
-
             <button type="submit" className="btn w-100 py-2 mt-2" style={{ backgroundColor: "var(--color-descanso)", color: "white", borderRadius: "50px", border: "none" }}>
               Login
             </button>
