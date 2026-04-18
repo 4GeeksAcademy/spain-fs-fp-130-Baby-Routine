@@ -1,10 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-export const Carduser = () => {  
-  const userData = {
+export const Carduser = () => {
+  const [userData, setUserData] = useState({
     nombre: "Usuario Padre",
-    fotoUrl: null // Aqui iria la url de la imagen
-  };
+    fotoUrl: null 
+  });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUserData({
+        nombre: parsedUser.nombre || "Usuario Padre",
+        fotoUrl: parsedUser.foto_perfil || null
+      });
+    }
+  }, []);
 
   return (
     <div className="d-flex align-items-center p-2 mb-4 shadow-sm" 
@@ -26,7 +38,7 @@ export const Carduser = () => {
           {userData.nombre}
         </p>
         <p className="m-0 text-muted" style={{ fontSize: "0.75rem", marginTop: "-3px" }}>
-          @UsuarioPadre
+          @{userData.nombre.toLowerCase().replace(/\s+/g, '')}
         </p>
       </div>
 
@@ -34,7 +46,6 @@ export const Carduser = () => {
   );
 };
 
-// Estilos del contenedor del avatar
 const avatarStyle = {
   width: "50px",
   height: "50px",
@@ -44,3 +55,8 @@ const avatarStyle = {
   flexShrink: 0
 };
 
+const imgStyle = {
+  width: "100%",
+  height: "100%",
+  objectFit: "cover"
+};
