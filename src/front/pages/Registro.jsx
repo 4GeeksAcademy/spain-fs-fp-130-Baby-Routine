@@ -3,6 +3,7 @@ import logoApp from "../assets/Logo Baby Zzync 1.png";
 import { Link, useNavigate } from "react-router-dom";
 import Cloudinary from "../components/Cloudinary";
 import Autocomplete from "react-google-autocomplete";
+import GoogleInput from "../components/GoogleInput";
 
 export const Registro = () => {
   const navigate = useNavigate();
@@ -155,32 +156,23 @@ export const Registro = () => {
             {validated && !formData.edad && <small className="text-danger ms-5">Campo Obligatorio</small>}
           </div>
 
-          <div className="d-flex align-items-center mb-3">
-            <i className="fas fa-home me-3 text-muted" style={{ width: "20px" }}></i>
-            <Autocomplete
-              apiKey="AIzaSyAIjEtDE9DT_aJdXjy9uC2NMdzUKhtOjOU"
-              onPlaceSelected={handleHogarSelect}
-              onChange={(e) => setFormData({ ...formData, direccionHogar: e.target.value })}
-              className="form-control input-line"
-              placeholder="DIRECCIÓN DEL HOGAR"
-              options={{ types: ["address"] }}
-              defaultValue={formData.direccionHogar}
-              required
-            />
-          </div>
+          <GoogleInput
+            icon="fas fa-home"
+            placeholder="DIRECCIÓN DEL HOGAR"
+            value={formData.direccionHogar}
+            onPlaceSelected={handleHogarSelect}
+            onChange={(e) => setFormData({ ...formData, direccionHogar: e.target.value })}
+            required={true}
+          />
 
-          <div className="d-flex align-items-center mb-3">
-            <i className="fas fa-building me-3 text-muted" style={{ width: "20px" }}></i>
-            <Autocomplete
-              apiKey="AIzaSyAIjEtDE9DT_aJdXjy9uC2NMdzUKhtOjOU"
-              onPlaceSelected={handleTrabajoSelect}
-              onChange={(e) => setFormData({ ...formData, direccionTrabajo: e.target.value })}
-              className="form-control input-line"
-              placeholder="DIRECCIÓN DEL TRABAJO"
-              options={{ types: ["address"] }}
-              defaultValue={formData.direccionTrabajo}
-            />
-          </div>
+          <GoogleInput
+            icon="fas fa-building"
+            placeholder="DIRECCIÓN DEL TRABAJO"
+            value={formData.direccionTrabajo}
+            onPlaceSelected={handleTrabajoSelect}
+            onChange={(e) => setFormData({ ...formData, direccionTrabajo: e.target.value })}
+            required={false}
+          />
 
           <div className="mb-4">
             <div className="d-flex align-items-center">
