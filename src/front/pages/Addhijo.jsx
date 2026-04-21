@@ -15,17 +15,16 @@ export const Addhijo = () => {
   const [info, setInfo] = useState("");
   const [foto, setFoto] = useState("");
 
-  // ESTADOS PARA SWITCHES 
+  // ESTADOS PARA SWITCHES (condiciones variables)
   const [hasIntolerancia, setHasIntolerancia] = useState(false);
   const [hasAlergia, setHasAlergia] = useState(false);
   const [hasAsma, setHasAsma] = useState(false);
-  const [hasSangre, setHasSangre] = useState(false);
 
   // ESTADOS VALORES MEDICOS
   const [intolerancia, setIntolerancia] = useState("");
   const [alergia, setAlergia] = useState("");
   const [nivelAsma, setNivelAsma] = useState("");
-  const [tipoSangre, setTipoSangre] = useState("");
+  const [tipoSangre, setTipoSangre] = useState(""); 
 
   // ESTADOS DESARROLLO
   const [gatea, setGatea] = useState(false);
@@ -40,7 +39,6 @@ export const Addhijo = () => {
             confirmButtonText: 'Corregir',
             confirmButtonColor: 'var(--color-primario)',
             width: '400px',
-            padding: '1.2rem',
             customClass: {
                 popup: 'my-custom-popup',
                 confirmButton: 'rounded-pill px-4 shadow-sm'
@@ -58,17 +56,15 @@ export const Addhijo = () => {
             edad,
             info,
             fotoUrl: foto,
-            // Datos de desarrollo
             desarrollo: {
                 gatea: gatea ? "Sí" : "No",
                 autonomiaBano: vaAlBano ? "Sí" : "No"
             },
-            // Datos medicos adicionales
             datosMedicos: {
                 intolerancia: hasIntolerancia ? intolerancia : "Ninguna",
                 alergia: hasAlergia ? alergia : "Ninguna",
                 asma: hasAsma ? nivelAsma : "No",
-                tipoSangre: hasSangre ? tipoSangre : "No informado"
+                tipoSangre: tipoSangre || "No informado"
             }
         }
     });
@@ -79,15 +75,12 @@ export const Addhijo = () => {
         showConfirmButton: false,
         timer: 1500,
         width: '400px',
-        customClass: {
-            popup: 'my-custom-popup'
-        }
+        customClass: { popup: 'my-custom-popup' }
     }).then(() => {
         navigate("/menupadre");
     });
   };
 
-  // Estilo común para selects
   const selectStyle = { fontSize: "0.85rem", backgroundColor: "#f8f9fa" };
 
   return (
@@ -138,13 +131,13 @@ export const Addhijo = () => {
               </button>
             </div>
 
-            {/* Apartado de informacion medica (switches) */}
+            {/* Apartado de información médica */}
             <div className="text-start mt-3 p-2 bg-light rounded-4">
               <p className="small fw-bold text-muted mb-3 text-center">Información Médica Especial</p>
 
               {/* Intolerancias */}
-              <div className="mb-2">
-                <div className="d-flex justify-content-between align-items-center px-2">
+              <div className="mb-3 px-2">
+                <div className="d-flex justify-content-between align-items-center">
                   <span className="small text-muted">Intolerancias</span>
                   <div className="form-check form-switch">
                     <input className="form-check-input" type="checkbox" checked={hasIntolerancia} onChange={e => setHasIntolerancia(e.target.checked)} />
@@ -162,8 +155,8 @@ export const Addhijo = () => {
               </div>
 
               {/* Alergias */}
-              <div className="mb-2">
-                <div className="d-flex justify-content-between align-items-center px-2">
+              <div className="mb-3 px-2">
+                <div className="d-flex justify-content-between align-items-center">
                   <span className="small text-muted">Alergias</span>
                   <div className="form-check form-switch">
                     <input className="form-check-input" type="checkbox" checked={hasAlergia} onChange={e => setHasAlergia(e.target.checked)} />
@@ -182,8 +175,8 @@ export const Addhijo = () => {
               </div>
 
               {/* Asma */}
-              <div className="mb-2">
-                <div className="d-flex justify-content-between align-items-center px-2">
+              <div className="mb-3 px-2">
+                <div className="d-flex justify-content-between align-items-center">
                   <span className="small text-muted">¿Asmático/a?</span>
                   <div className="form-check form-switch">
                     <input className="form-check-input" type="checkbox" checked={hasAsma} onChange={e => setHasAsma(e.target.checked)} />
@@ -199,51 +192,39 @@ export const Addhijo = () => {
                 )}
               </div>
 
-              {/* Tipo de Sangre */}
-              <div className="mb-2">
-                <div className="d-flex justify-content-between align-items-center px-2">
-                  <span className="small text-muted">Grupo Sanguíneo</span>
-                  <div className="form-check form-switch">
-                    <input className="form-check-input" type="checkbox" checked={hasSangre} onChange={e => setHasSangre(e.target.checked)} />
-                  </div>
-                </div>
-                {hasSangre && (
-                  <select className="form-select form-select-sm rounded-pill mt-1" style={selectStyle} value={tipoSangre} onChange={e => setTipoSangre(e.target.value)}>
-                    <option value="">Selecciona grupo...</option>
-                    <option value="A+">A+</option><option value="A-">A-</option>
-                    <option value="B+">B+</option><option value="B-">B-</option>
-                    <option value="O+">O+</option><option value="O-">O-</option>
-                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
-                  </select>
-                )}
+              {/* Grupo Sanguíneo */}
+              <div className="mb-2 px-2 pb-2">
+                <span className="small text-muted d-block mb-1">Grupo Sanguíneo</span>
+                <select 
+                  className="form-select form-select-sm rounded-pill" 
+                  style={selectStyle} 
+                  value={tipoSangre} 
+                  onChange={e => setTipoSangre(e.target.value)}
+                >
+                  <option value="">Selecciona grupo...</option>
+                  <option value="A+">A+</option><option value="A-">A-</option>
+                  <option value="B+">B+</option><option value="B-">B-</option>
+                  <option value="O+">O+</option><option value="O-">O-</option>
+                  <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                </select>
               </div>
             </div>
 
-            {/* APARTADO DE DESARROLLO (Seccion de hitos)*/}
+            {/* Apartado de desarrollo */}
             <div className="text-start mt-3 p-3 border rounded-4 bg-white shadow-sm">
               <p className="small fw-bold text-muted mb-2 text-center">Hitos de Desarrollo</p>
               
               <div className="d-flex justify-content-between align-items-center mb-2 px-1">
                 <span className="small text-muted">¿Ya gatea?</span>
                 <div className="form-check form-switch">
-                  <input 
-                    className="form-check-input" 
-                    type="checkbox" 
-                    checked={gatea} 
-                    onChange={e => setGatea(e.target.checked)} 
-                  />
+                  <input className="form-check-input" type="checkbox" checked={gatea} onChange={e => setGatea(e.target.checked)} />
                 </div>
               </div>
 
               <div className="d-flex justify-content-between align-items-center px-1">
                 <span className="small text-muted">¿Va al baño solo/a?</span>
                 <div className="form-check form-switch">
-                  <input 
-                    className="form-check-input" 
-                    type="checkbox" 
-                    checked={vaAlBano} 
-                    onChange={e => setVaAlBano(e.target.checked)} 
-                  />
+                  <input className="form-check-input" type="checkbox" checked={vaAlBano} onChange={e => setVaAlBano(e.target.checked)} />
                 </div>
               </div>
             </div>

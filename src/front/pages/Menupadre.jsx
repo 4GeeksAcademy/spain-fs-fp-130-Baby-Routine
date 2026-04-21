@@ -90,7 +90,7 @@ export const Menupadre = () => {
             )}
           </div>
 
-          {/* Botón de Acción Principal (Contextual) */}
+          {/* Botón de Acción Principal */}
           <div className="text-center mt-auto pt-3">
             {activeTab === "hijos" ? (
                 <Link to="/addhijo">
