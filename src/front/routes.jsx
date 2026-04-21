@@ -14,6 +14,8 @@ import { Menupadre } from "./pages/Menupadre";
 import { Addhijo } from "./pages/Addhijo.jsx";
 import { AddAutorizado } from "./pages/AddAutorizado.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { AsignarRutina } from "./pages/AsignarRutina.jsx";
+import { Rutinas } from "./pages/Rutinas.jsx";
 import { CrearRutina } from "./pages/CrearRutina.jsx";
 
 export const router = createBrowserRouter(
@@ -26,12 +28,16 @@ export const router = createBrowserRouter(
         <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/single/:theId" element={<ProtectedRoute><Single /></ProtectedRoute>} />
         <Route path="/demo" element={<ProtectedRoute><Demo /></ProtectedRoute>} />
-        <Route path="/CrearRutina" element={<ProtectedRoute><CrearRutina /></ProtectedRoute>} />
-        <Route path="/familia" element={<ProtectedRoute><FamiliaRutina /></ProtectedRoute>} />
+
+        <Route path="/Rutinas" element={<ProtectedRoute><Rutinas /></ProtectedRoute>} />
+        <Route path="/Asignar-Rutina" element={<ProtectedRoute><AsignarRutina /></ProtectedRoute>} />
+        <Route path="/Crear-rutina" element={<ProtectedRoute><CrearRutina /></ProtectedRoute>} />
+        <Route path="/familia-rutina" element={<ProtectedRoute><FamiliaRutina /></ProtectedRoute>} />
+
         <Route path="/Menupadre" element={<ProtectedRoute><Menupadre /></ProtectedRoute>} />
         <Route path="/addhijo" element={<ProtectedRoute><Addhijo /></ProtectedRoute>} />
         <Route path="/add-autorizado" element={<ProtectedRoute><AddAutorizado /></ProtectedRoute>} />
-
+        
       </Route>
     )
 );
