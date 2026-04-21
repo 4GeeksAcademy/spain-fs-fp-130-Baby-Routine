@@ -9,9 +9,11 @@ export const CrearRutina = () => {
         fotoUrl: null
     });
 
+    const [showMenu, setShowMenu] = useState(false);
+
     return (
         <div className="bg-registro">
-            <div className="mobile-container d-flex flex-column" style={{ height: "85vh" }}>
+            <div className="mobile-container d-flex flex-column">
                 <div className="d-flex align-items-center justify-content-between p-3" style={{ backgroundColor: "var(--color-primario)", minHeight: "80px" }}>
                     <div style={{ width: "24px" }}></div>
                     <img src={logoApp} alt="Logo Baby Zzzync" style={{ width: "150px", height: "auto" }} />
@@ -66,10 +68,40 @@ export const CrearRutina = () => {
                             </div>
                         </div>
 
-                        <div className="mt-auto mb-2">
+                        <div className="mt-auto mb-2 position-relative">
+                            
+                            {showMenu && (
+                                <div className="position-absolute w-100 mb-2" 
+                                     style={{ 
+                                        bottom: "100%", 
+                                        left: 0, 
+                                        backgroundColor: "white", 
+                                        borderRadius: "20px", 
+                                        boxShadow: "0 -4px 12px rgba(0,0,0,0.1)",
+                                        zIndex: 10,
+                                        overflow: "hidden"
+                                     }}>
+                                    <button 
+                                        className="btn w-100 py-3 border-bottom text-uppercase fw-bold" 
+                                        style={{ color: "var(--color-primario)", fontSize: "0.9rem" }}
+                                        onClick={() => { console.log("Asignar"); setShowMenu(false); }}
+                                    >
+                                        ASIGNAR RUTINA
+                                    </button>
+                                    <button 
+                                        className="btn w-100 py-3 text-uppercase fw-bold" 
+                                        style={{ color: "var(--color-primario)", fontSize: "0.9rem" }}
+                                        onClick={() => { console.log("Crear"); setShowMenu(false); }}
+                                    >
+                                        CREAR NUEVA RUTINA
+                                    </button>
+                                </div>
+                            )}
+
                             <button
-                                type="submit"
-                                className="btn w-100 py-3"
+                                type="button"
+                                className="btn w-100 py-3 d-flex justify-content-between align-items-center px-4"
+                                onClick={() => setShowMenu(!showMenu)}
                                 style={{
                                     backgroundColor: "var(--color-primario)",
                                     color: "white",
@@ -78,9 +110,10 @@ export const CrearRutina = () => {
                                     fontWeight: "bold",
                                     fontSize: "1.1rem",
                                     boxShadow: "0 4px 12px rgba(72, 12, 168, 0.3)"
-                                }}
+                                }} 
                             >
-                                CREAR RUTINA
+                                <span className="flex-grow-1 text-center">OPCIONES DE RUTINA</span>
+                                <i className={`fas fa-chevron-${showMenu ? 'down' : 'up'}`}></i>
                             </button>
                         </div>
                     </form>
