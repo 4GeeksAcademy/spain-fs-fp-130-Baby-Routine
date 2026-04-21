@@ -27,6 +27,10 @@ export const Addhijo = () => {
   const [nivelAsma, setNivelAsma] = useState("");
   const [tipoSangre, setTipoSangre] = useState("");
 
+  // ESTADOS DESARROLLO
+  const [gatea, setGatea] = useState(false);
+  const [vaAlBano, setVaAlBano] = useState(false);
+
   const handleSave = () => {
     if (!nombre || !apellidos || edad === 0) {
         Swal.fire({
@@ -54,6 +58,11 @@ export const Addhijo = () => {
             edad,
             info,
             fotoUrl: foto,
+            // Datos de desarrollo
+            desarrollo: {
+                gatea: gatea ? "Sí" : "No",
+                autonomiaBano: vaAlBano ? "Sí" : "No"
+            },
             // Datos medicos adicionales
             datosMedicos: {
                 intolerancia: hasIntolerancia ? intolerancia : "Ninguna",
@@ -207,6 +216,35 @@ export const Addhijo = () => {
                     <option value="AB+">AB+</option><option value="AB-">AB-</option>
                   </select>
                 )}
+              </div>
+            </div>
+
+            {/* APARTADO DE DESARROLLO (Seccion de hitos)*/}
+            <div className="text-start mt-3 p-3 border rounded-4 bg-white shadow-sm">
+              <p className="small fw-bold text-muted mb-2 text-center">Hitos de Desarrollo</p>
+              
+              <div className="d-flex justify-content-between align-items-center mb-2 px-1">
+                <span className="small text-muted">¿Ya gatea?</span>
+                <div className="form-check form-switch">
+                  <input 
+                    className="form-check-input" 
+                    type="checkbox" 
+                    checked={gatea} 
+                    onChange={e => setGatea(e.target.checked)} 
+                  />
+                </div>
+              </div>
+
+              <div className="d-flex justify-content-between align-items-center px-1">
+                <span className="small text-muted">¿Va al baño solo/a?</span>
+                <div className="form-check form-switch">
+                  <input 
+                    className="form-check-input" 
+                    type="checkbox" 
+                    checked={vaAlBano} 
+                    onChange={e => setVaAlBano(e.target.checked)} 
+                  />
+                </div>
               </div>
             </div>
 
