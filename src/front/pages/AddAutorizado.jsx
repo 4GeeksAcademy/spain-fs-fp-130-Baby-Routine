@@ -6,7 +6,7 @@ import Cloudinary from "../components/Cloudinary.jsx";
 import Swal from 'sweetalert2';
 
 export const AddAutorizado = () => {
-  const { dispatch } = useGlobalReducer();
+  const { store, dispatch } = useGlobalReducer(); // Aqui se extrae el store para obtener los hijos
   const navigate = useNavigate();
 
   // Estados para capturar información
@@ -16,6 +16,7 @@ export const AddAutorizado = () => {
   const [dni, setDni] = useState(""); 
   const [direccion, setDireccion] = useState(""); 
   const [parentesco, setParentesco] = useState("");
+  const [hijoId, setHijoId] = useState(""); // Nuevo estado para el ID del hijo
   const [foto, setFoto] = useState(null);
   
   const [fechaInicio, setFechaInicio] = useState("");
@@ -29,13 +30,13 @@ export const AddAutorizado = () => {
   };
 
   const handleSave = () => {
-    // Validacion: si es permanente las fechas no son necesarias
+    // Validación: ahora incluimos que haya un hijo seleccionado
     const fechasValidas = esPermanente ? true : (fechaInicio && fechaFin);
 
-    if (!nombre || !apellidos || !telefono || !dni || !parentesco || !fechasValidas) {
+    if (!nombre || !apellidos || !telefono || !dni || !parentesco || !hijoId || !fechasValidas) {
         Swal.fire({
             title: '¡Faltan datos!',
-            text: 'Rellena los campos obligatorios.',
+            text: 'Rellena todos los campos, incluyendo a quién autorizas recoger.',
             icon: 'warning',
             confirmButtonText: 'Entendido',
             confirmButtonColor: 'var(--color-primario)',
@@ -55,6 +56,7 @@ export const AddAutorizado = () => {
         payload: { 
             id: Date.now(), 
             nombre, apellidos, telefono, dni, direccion, parentesco,
+            hijoId: parseInt(hijoId), 
             fotoUrl: foto,
             esPermanente, 
             validoDesde: esPermanente ? "Permanente" : fechaInicio,
@@ -97,6 +99,28 @@ export const AddAutorizado = () => {
             <p className="text-muted small m-0">Persona delegada para recoger a tu hijo/a</p>
           </div>
 
+          {/* Dropdown con los hijos disponbles */}
+          <select 
+            className="form-select rounded-pill border-0 bg-light p-3 shadow-inner" 
+            value={hijoId}
+            onChange={(e) => setHijoId(e.target.value)}
+            style={{ 
+                fontSize: "0.9rem", 
+                color: hijoId === "" ? "#6c757d" : "#212529"
+            }}
+          >
+            <option value="" disabled>¿A quién puede recoger?</option>
+            {store.hijos && store.hijos.length > 0 ? (
+              store.hijos.map((hijo) => (
+                <option key={hijo.id} value={hijo.id}>
+                  {hijo.nombre} {hijo.apellido}
+                </option>
+              ))
+            ) : (
+              <option disabled>No hay hijos registrados</option>
+            )}
+          </select>
+
           <input 
             type="text" 
             className="form-control rounded-pill border-0 bg-light p-3 shadow-inner" 
@@ -138,14 +162,15 @@ export const AddAutorizado = () => {
           <select 
             className="form-select rounded-pill border-0 bg-light p-3 shadow-inner" 
             value={parentesco} 
-            onChange={(e) => setParentesco(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setParentesco(val);
+              if(val === "Progenitor") setEsPermanente(true);
+              else setEsPermanente(false);
+            }}
             style={{ 
                 fontSize: "0.9rem", 
-                color: parentesco === "" ? "#6c757d" : "#212529",
-                backgroundImage: "url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Cpath fill=%22none%22 stroke=%22%23666%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M2 5l6 6 6-6%22/%3E%3C/svg%3E')",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "right 1.25rem center",
-                backgroundSize: "16px 12px"
+                color: parentesco === "" ? "#6c757d" : "#212529"
             }}
           >
             <option value="" disabled>Selecciona el parentesco</option>
@@ -155,49 +180,52 @@ export const AddAutorizado = () => {
             <option value="Primo/a">Primo/a</option>
             <option value="Tío/a">Tío/a</option>
             <option value="Amigo/a">Amigo/a</option>
+            <option value="Tutor/a">Tutor/a Legal</option>
           </select>
 
-          {/* OPCION PERMANENTE */}
-          <div className="d-flex justify-content-between align-items-center px-3 mt-2">
-            <label className="small fw-bold text-muted">¿Autorización permanente?</label>
-            <div className="form-check form-switch">
-              <input 
-                className="form-check-input" 
-                type="checkbox" 
-                role="switch" 
-                checked={esPermanente}
-                onChange={(e) => setEsPermanente(e.target.checked)}
-                style={{ cursor: "pointer", transform: "scale(1.2)" }}
-              />
-            </div>
-          </div>
+          {parentesco !== "Progenitor" && (
+            <>
+              <div className="d-flex justify-content-between align-items-center px-3 mt-2">
+                <label className="small fw-bold text-muted">¿Autorización permanente?</label>
+                <div className="form-check form-switch">
+                  <input 
+                    className="form-check-input" 
+                    type="checkbox" 
+                    role="switch" 
+                    checked={esPermanente}
+                    onChange={(e) => setEsPermanente(e.target.checked)}
+                    style={{ cursor: "pointer", transform: "scale(1.2)" }}
+                  />
+                </div>
+              </div>
 
-          {/* FECHAS (Se deshabilitan si es permanente) */}
-          <div className={`row g-2 ${esPermanente ? "opacity-50" : ""}`} style={{ transition: "0.3s" }}>
-            <div className="col-12 text-center">
-              <p className="small text-muted mb-1 fw-bold">Periodo de validez:</p>
-            </div>
-            <div className="col-6 text-center">
-              <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Desde:</label>
-              <input 
-                type="date" 
-                className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
-                disabled={esPermanente}
-                onChange={(e) => setFechaInicio(e.target.value)}
-                style={{ fontSize: "0.85rem" }}
-              />
-            </div>
-            <div className="col-6 text-center">
-              <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Hasta:</label>
-              <input 
-                type="date" 
-                className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
-                disabled={esPermanente}
-                onChange={(e) => setFechaFin(e.target.value)}
-                style={{ fontSize: "0.85rem" }}
-              />
-            </div>
-          </div>
+              {!esPermanente && (
+                <div className="row g-2" style={{ transition: "0.3s" }}>
+                  <div className="col-12 text-center">
+                    <p className="small text-muted mb-1 fw-bold">Periodo de validez:</p>
+                  </div>
+                  <div className="col-6 text-center">
+                    <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Desde:</label>
+                    <input 
+                      type="date" 
+                      className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
+                      onChange={(e) => setFechaInicio(e.target.value)}
+                      style={{ fontSize: "0.85rem" }}
+                    />
+                  </div>
+                  <div className="col-6 text-center">
+                    <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Hasta:</label>
+                    <input 
+                      type="date" 
+                      className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
+                      onChange={(e) => setFechaFin(e.target.value)}
+                      style={{ fontSize: "0.85rem" }}
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
 
           <div className="d-flex gap-2 mt-3">
             <Link to="/menupadre" className="btn btn-light rounded-pill flex-grow-1 p-3 shadow-sm" style={{ fontSize: "0.9rem", color: "#666" }}>

@@ -3,12 +3,14 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 import Swal from 'sweetalert2';
 
 export const Cardautorizado = ({ autorizado }) => {
-  const { dispatch } = useGlobalReducer();
+  const { store, dispatch } = useGlobalReducer();
+
+  // Buscamos los datos del hijo vinculado usando el hijoId guardado
+  const hijoVinculado = store.hijos?.find(h => h.id === autorizado.hijoId);
 
   const handleDelete = (e) => {
     e.stopPropagation();
 
-    // Alerta de confirmacion, con el estilo actualizado
     Swal.fire({
       title: '¿Eliminar?',
       text: `Se borrará la autorización de ${autorizado.nombre}.`,
@@ -51,7 +53,7 @@ export const Cardautorizado = ({ autorizado }) => {
         className="card border-0 shadow-sm position-relative" 
         style={{ borderRadius: "15px", backgroundColor: "#fff", border: "1px solid #f0f0f0" }}
       >
-        {/* BOTÓN ELIMINAR */}
+        {/* BOTON ELIMINAR */}
         <button 
           onClick={handleDelete}
           className="btn btn-sm position-absolute" 
@@ -75,7 +77,14 @@ export const Cardautorizado = ({ autorizado }) => {
             <h6 className="mb-0 fw-bold" style={{ fontSize: "0.9rem", color: "#333" }}>
                 {autorizado.nombre} {autorizado.apellidos}
             </h6>
-            <p className="mb-1 text-muted" style={{ fontSize: "0.75rem" }}>
+            
+            {/* Se ve a quien recoge en la Card */}
+            <p className="mb-1 text-primary fw-bold" style={{ fontSize: "0.7rem" }}>
+              <i className="fas fa-child me-1"></i> 
+              Recoge a: {hijoVinculado ? hijoVinculado.nombre : "Hijo no encontrado"}
+            </p>
+
+            <p className="mb-1 text-muted" style={{ fontSize: "0.7rem" }}>
               {autorizado.parentesco || "Autorizado"}
               {autorizado.esPermanente && <span className="ms-2 badge rounded-pill bg-success-subtle text-success border border-success-subtle" style={{fontSize: "0.6rem"}}>Permanente</span>}
             </p>
@@ -98,7 +107,6 @@ export const Cardautorizado = ({ autorizado }) => {
             <div className="modal-content" style={{ borderRadius: "20px", border: "none" }}>
               <div className="modal-body text-center pt-4 pb-4 px-4">
                 
-                {/* Foto en el Modal */}
                 <img 
                   src={autorizado.fotoUrl || "https://via.placeholder.com/150"} 
                   alt={autorizado.nombre} 
@@ -110,16 +118,18 @@ export const Cardautorizado = ({ autorizado }) => {
                 <p className="text-muted small mb-3">{autorizado.apellidos}</p>
                 
                 <div className="text-start">
+                    {/* INFO DEL NIÑO EN EL MODAL */}
+                    <div className="mb-2 border-bottom pb-1 bg-primary-subtle p-2 rounded-2">
+                        <label className="text-primary d-block mb-0" style={{ fontSize: "0.65rem", fontWeight: "bold" }}>AUTORIZADO PARA RECOGER A:</label>
+                        <span className="fw-bold" style={{ color: "#0d6efd", fontSize: "0.9rem" }}>
+                          {hijoVinculado ? `${hijoVinculado.nombre} ${hijoVinculado.apellido}` : "Hijo no encontrado"}
+                        </span>
+                    </div>
+
                     {/* DNI */}
                     <div className="mb-2 border-bottom pb-1">
                         <label className="text-muted d-block mb-0" style={{ fontSize: "0.65rem", fontWeight: "bold" }}>DNI / NIE</label>
                         <span style={{ color: "#444", fontSize: "0.85rem" }}>{autorizado.dni}</span>
-                    </div>
-
-                    {/* DIRECCIÓN */}
-                    <div className="mb-2 border-bottom pb-1">
-                        <label className="text-muted d-block mb-0" style={{ fontSize: "0.65rem", fontWeight: "bold" }}>DIRECCIÓN</label>
-                        <span style={{ color: "#444", fontSize: "0.85rem" }}>{autorizado.direccion || "No especificada"}</span>
                     </div>
 
                     {/* TELÉFONO */}
@@ -134,7 +144,7 @@ export const Cardautorizado = ({ autorizado }) => {
                         <span style={{ color: "#444", fontSize: "0.85rem" }}>{autorizado.parentesco || "Autorizado"}</span>
                     </div>
 
-                    {/* RANGO DE FECHAS O PERMANENCIA */}
+                    {/* RANGO DE FECHAS */}
                     <div className="bg-light p-2 rounded-3 mt-3 shadow-sm border">
                         <label className="text-muted d-block text-center mb-1" style={{ fontSize: "0.6rem", fontWeight: "bold", textTransform: "uppercase" }}>Validez del Permiso</label>
                         
@@ -170,8 +180,6 @@ export const Cardautorizado = ({ autorizado }) => {
             </div>
           </div>
         </div>
-        {/* FIN MODAL */}
-        
       </div>
     </div>
   );
