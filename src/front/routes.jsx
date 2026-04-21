@@ -14,6 +14,7 @@ import { Menupadre } from "./pages/Menupadre";
 import { Addhijo } from "./pages/Addhijo.jsx";
 import { AddAutorizado } from "./pages/AddAutorizado.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { CrearRutina } from "./pages/CrearRutina.jsx";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -25,6 +26,7 @@ export const router = createBrowserRouter(
         <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/single/:theId" element={<ProtectedRoute><Single /></ProtectedRoute>} />
         <Route path="/demo" element={<ProtectedRoute><Demo /></ProtectedRoute>} />
+        <Route path="/CrearRutina" element={<ProtectedRoute><CrearRutina /></ProtectedRoute>} />
         <Route path="/familia" element={<ProtectedRoute><FamiliaRutina /></ProtectedRoute>} />
         <Route path="/Menupadre" element={<ProtectedRoute><Menupadre /></ProtectedRoute>} />
         <Route path="/addhijo" element={<ProtectedRoute><Addhijo /></ProtectedRoute>} />
