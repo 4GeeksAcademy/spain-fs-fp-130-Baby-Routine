@@ -15,6 +15,18 @@ export const Addhijo = () => {
   const [info, setInfo] = useState("");
   const [foto, setFoto] = useState("");
 
+  // ESTADOS PARA SWITCHES 
+  const [hasIntolerancia, setHasIntolerancia] = useState(false);
+  const [hasAlergia, setHasAlergia] = useState(false);
+  const [hasAsma, setHasAsma] = useState(false);
+  const [hasSangre, setHasSangre] = useState(false);
+
+  // ESTADOS VALORES MEDICOS
+  const [intolerancia, setIntolerancia] = useState("");
+  const [alergia, setAlergia] = useState("");
+  const [nivelAsma, setNivelAsma] = useState("");
+  const [tipoSangre, setTipoSangre] = useState("");
+
   const handleSave = () => {
     if (!nombre || !apellidos || edad === 0) {
         Swal.fire({
@@ -33,7 +45,6 @@ export const Addhijo = () => {
         return;
     }
 
-    
     dispatch({
         type: "add_hijo",
         payload: { 
@@ -42,11 +53,17 @@ export const Addhijo = () => {
             apellido: apellidos, 
             edad,
             info,
-            fotoUrl: foto 
+            fotoUrl: foto,
+            // Datos medicos adicionales
+            datosMedicos: {
+                intolerancia: hasIntolerancia ? intolerancia : "Ninguna",
+                alergia: hasAlergia ? alergia : "Ninguna",
+                asma: hasAsma ? nivelAsma : "No",
+                tipoSangre: hasSangre ? tipoSangre : "No informado"
+            }
         }
     });
 
-    
     Swal.fire({
         icon: 'success',
         title: '¡Niño registrado!',
@@ -59,7 +76,10 @@ export const Addhijo = () => {
     }).then(() => {
         navigate("/menupadre");
     });
-};
+  };
+
+  // Estilo común para selects
+  const selectStyle = { fontSize: "0.85rem", backgroundColor: "#f8f9fa" };
 
   return (
     <div className="bg-registro min-vh-100 d-flex align-items-center justify-content-center py-4">
@@ -109,9 +129,90 @@ export const Addhijo = () => {
               </button>
             </div>
 
+            {/* Apartado de informacion medica (switches) */}
+            <div className="text-start mt-3 p-2 bg-light rounded-4">
+              <p className="small fw-bold text-muted mb-3 text-center">Información Médica Especial</p>
+
+              {/* Intolerancias */}
+              <div className="mb-2">
+                <div className="d-flex justify-content-between align-items-center px-2">
+                  <span className="small text-muted">Intolerancias</span>
+                  <div className="form-check form-switch">
+                    <input className="form-check-input" type="checkbox" checked={hasIntolerancia} onChange={e => setHasIntolerancia(e.target.checked)} />
+                  </div>
+                </div>
+                {hasIntolerancia && (
+                  <select className="form-select form-select-sm rounded-pill mt-1" style={selectStyle} value={intolerancia} onChange={e => setIntolerancia(e.target.value)}>
+                    <option value="">¿Cuál?</option>
+                    <option value="Lactosa">Lactosa</option>
+                    <option value="Gluten">Gluten</option>
+                    <option value="Fructosa">Fructosa</option>
+                    <option value="Otra">Otra</option>
+                  </select>
+                )}
+              </div>
+
+              {/* Alergias */}
+              <div className="mb-2">
+                <div className="d-flex justify-content-between align-items-center px-2">
+                  <span className="small text-muted">Alergias</span>
+                  <div className="form-check form-switch">
+                    <input className="form-check-input" type="checkbox" checked={hasAlergia} onChange={e => setHasAlergia(e.target.checked)} />
+                  </div>
+                </div>
+                {hasAlergia && (
+                  <select className="form-select form-select-sm rounded-pill mt-1" style={selectStyle} value={alergia} onChange={e => setAlergia(e.target.value)}>
+                    <option value="">¿A qué?</option>
+                    <option value="Frutos Secos">Frutos Secos</option>
+                    <option value="Pescado">Pescado</option>
+                    <option value="Huevo">Huevo</option>
+                    <option value="Polen">Polen</option>
+                    <option value="Medicamentos">Medicamentos</option>
+                  </select>
+                )}
+              </div>
+
+              {/* Asma */}
+              <div className="mb-2">
+                <div className="d-flex justify-content-between align-items-center px-2">
+                  <span className="small text-muted">¿Asmático/a?</span>
+                  <div className="form-check form-switch">
+                    <input className="form-check-input" type="checkbox" checked={hasAsma} onChange={e => setHasAsma(e.target.checked)} />
+                  </div>
+                </div>
+                {hasAsma && (
+                  <select className="form-select form-select-sm rounded-pill mt-1" style={selectStyle} value={nivelAsma} onChange={e => setNivelAsma(e.target.value)}>
+                    <option value="">Frecuencia/Nivel</option>
+                    <option value="Ocasional">Ocasional</option>
+                    <option value="Moderado">Moderado</option>
+                    <option value="Crónico">Crónico</option>
+                  </select>
+                )}
+              </div>
+
+              {/* Tipo de Sangre */}
+              <div className="mb-2">
+                <div className="d-flex justify-content-between align-items-center px-2">
+                  <span className="small text-muted">Grupo Sanguíneo</span>
+                  <div className="form-check form-switch">
+                    <input className="form-check-input" type="checkbox" checked={hasSangre} onChange={e => setHasSangre(e.target.checked)} />
+                  </div>
+                </div>
+                {hasSangre && (
+                  <select className="form-select form-select-sm rounded-pill mt-1" style={selectStyle} value={tipoSangre} onChange={e => setTipoSangre(e.target.value)}>
+                    <option value="">Selecciona grupo...</option>
+                    <option value="A+">A+</option><option value="A-">A-</option>
+                    <option value="B+">B+</option><option value="B-">B-</option>
+                    <option value="O+">O+</option><option value="O-">O-</option>
+                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                  </select>
+                )}
+              </div>
+            </div>
+
             <textarea 
               className="form-control text-center mt-2 shadow-sm" 
-              placeholder="Información relevante (Alergias, notas...)" 
+              placeholder="Notas adicionales" 
               style={{ borderRadius: "15px", height: "80px" }} 
               value={info}
               onChange={e => setInfo(e.target.value)} 
@@ -130,8 +231,3 @@ export const Addhijo = () => {
     </div>
   );
 };
-
-// Estilo
-const inputStyle = { borderRadius: "20px", border: "1px solid #ced4da", fontSize: "0.95rem", padding: "10px", backgroundColor: "#f9f9f9" };
-const photoContainerStyle = { width: "85px", height: "85px", borderRadius: "50%", backgroundColor: "#e4e4e4", flexDirection: "column", display: "flex", cursor: "pointer", border: "2px dashed #ccc" };
-const btnSubmitStyle = { backgroundColor: "var(--color-descanso)", color: "white", borderRadius: "12px", fontWeight: "bold", padding: "12px 30px", border: "none" };
