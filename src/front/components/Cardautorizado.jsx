@@ -51,7 +51,7 @@ export const Cardautorizado = ({ autorizado }) => {
         className="card border-0 shadow-sm position-relative" 
         style={{ borderRadius: "15px", backgroundColor: "#fff", border: "1px solid #f0f0f0" }}
       >
-        {/* BOTÓN ELIMINAR */}
+        {/* BOTON ELIMINAR */}
         <button 
           onClick={handleDelete}
           className="btn btn-sm position-absolute" 

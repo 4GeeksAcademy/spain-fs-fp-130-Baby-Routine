@@ -138,7 +138,13 @@ export const AddAutorizado = () => {
           <select 
             className="form-select rounded-pill border-0 bg-light p-3 shadow-inner" 
             value={parentesco} 
-            onChange={(e) => setParentesco(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setParentesco(val);
+              // Si es Progenitor se activa permanente
+              if(val === "Progenitor") setEsPermanente(true);
+              else setEsPermanente(false);
+            }}
             style={{ 
                 fontSize: "0.9rem", 
                 color: parentesco === "" ? "#6c757d" : "#212529",
@@ -155,49 +161,55 @@ export const AddAutorizado = () => {
             <option value="Primo/a">Primo/a</option>
             <option value="Tío/a">Tío/a</option>
             <option value="Amigo/a">Amigo/a</option>
+            <option value="Tutor/a">Tutor/a Legal</option>
           </select>
 
-          {/* OPCION PERMANENTE */}
-          <div className="d-flex justify-content-between align-items-center px-3 mt-2">
-            <label className="small fw-bold text-muted">¿Autorización permanente?</label>
-            <div className="form-check form-switch">
-              <input 
-                className="form-check-input" 
-                type="checkbox" 
-                role="switch" 
-                checked={esPermanente}
-                onChange={(e) => setEsPermanente(e.target.checked)}
-                style={{ cursor: "pointer", transform: "scale(1.2)" }}
-              />
-            </div>
-          </div>
+          {/* solo se muestra datepicker si no es progenitor */}
+          {parentesco !== "Progenitor" && (
+            <>
+              {/* OPCION PERMANENTE */}
+              <div className="d-flex justify-content-between align-items-center px-3 mt-2">
+                <label className="small fw-bold text-muted">¿Autorización permanente?</label>
+                <div className="form-check form-switch">
+                  <input 
+                    className="form-check-input" 
+                    type="checkbox" 
+                    role="switch" 
+                    checked={esPermanente}
+                    onChange={(e) => setEsPermanente(e.target.checked)}
+                    style={{ cursor: "pointer", transform: "scale(1.2)" }}
+                  />
+                </div>
+              </div>
 
-          {/* FECHAS (Se deshabilitan si es permanente) */}
-          <div className={`row g-2 ${esPermanente ? "opacity-50" : ""}`} style={{ transition: "0.3s" }}>
-            <div className="col-12 text-center">
-              <p className="small text-muted mb-1 fw-bold">Periodo de validez:</p>
-            </div>
-            <div className="col-6 text-center">
-              <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Desde:</label>
-              <input 
-                type="date" 
-                className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
-                disabled={esPermanente}
-                onChange={(e) => setFechaInicio(e.target.value)}
-                style={{ fontSize: "0.85rem" }}
-              />
-            </div>
-            <div className="col-6 text-center">
-              <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Hasta:</label>
-              <input 
-                type="date" 
-                className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
-                disabled={esPermanente}
-                onChange={(e) => setFechaFin(e.target.value)}
-                style={{ fontSize: "0.85rem" }}
-              />
-            </div>
-          </div>
+              {/* BLOQUE DE FECHAS (Desaparece si es permanente) */}
+              {!esPermanente && (
+                <div className="row g-2" style={{ transition: "0.3s" }}>
+                  <div className="col-12 text-center">
+                    <p className="small text-muted mb-1 fw-bold">Periodo de validez:</p>
+                  </div>
+                  <div className="col-6 text-center">
+                    <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Desde:</label>
+                    <input 
+                      type="date" 
+                      className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
+                      onChange={(e) => setFechaInicio(e.target.value)}
+                      style={{ fontSize: "0.85rem" }}
+                    />
+                  </div>
+                  <div className="col-6 text-center">
+                    <label className="small text-muted" style={{ fontSize: "0.75rem" }}>Hasta:</label>
+                    <input 
+                      type="date" 
+                      className="form-control rounded-pill border-0 bg-light p-2 shadow-inner" 
+                      onChange={(e) => setFechaFin(e.target.value)}
+                      style={{ fontSize: "0.85rem" }}
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          )}
 
           <div className="d-flex gap-2 mt-3">
             <Link to="/menupadre" className="btn btn-light rounded-pill flex-grow-1 p-3 shadow-sm" style={{ fontSize: "0.9rem", color: "#666" }}>
