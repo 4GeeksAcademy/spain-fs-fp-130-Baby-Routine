@@ -4,6 +4,44 @@ import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 
 export const CrearRutina = () => {
     const navigate = useNavigate();
+    
+    const [nombre, setNombre] = useState("");
+    const [detalles, setDetalles] = useState("");
+    const [errores, setErrores] = useState({ nombre: false, detalles: false });
+
+    const handleCrearRutina = () => {
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        
+        if (!currentUser || !currentUser.id) {
+            alert("Sesión no válida. Por favor, inicia sesión de nuevo.");
+            navigate("/");
+            return;
+        }
+
+        const nuevosErrores = {
+            nombre: nombre.trim() === "",
+            detalles: detalles.trim() === ""
+        };
+
+        setErrores(nuevosErrores);
+
+        if (!nuevosErrores.nombre && !nuevosErrores.detalles) {
+            const storageKey = `rutinas_user_${currentUser.id}`;
+            
+            const rutinasGuardadas = JSON.parse(localStorage.getItem(storageKey)) || [];
+            
+            const nuevaRutina = {
+                id: Date.now(),
+                userId: currentUser.id,
+                nombre: nombre,
+                detalles: detalles
+            };
+
+            localStorage.setItem(storageKey, JSON.stringify([...rutinasGuardadas, nuevaRutina]));
+            
+            navigate("/rutinas"); 
+        }
+    };
 
     return (
         <div className="bg-registro">
@@ -23,33 +61,50 @@ export const CrearRutina = () => {
                                 type="text"
                                 className="form-control py-3 px-4 text-center"
                                 placeholder="NOMBRE DE LA RUTINA"
+                                value={nombre}
+                                onChange={(e) => {
+                                    setNombre(e.target.value);
+                                    setErrores({ ...errores, nombre: false });
+                                }}
                                 style={{
                                     borderRadius: "20px",
-                                    border: "none",
+                                    border: errores.nombre ? "2px solid red" : "none",
                                     boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
                                     fontSize: "0.9rem",
                                     fontWeight: "bold"
                                 }}
                             />
+                            {errores.nombre && (
+                                <span className="text-danger small mt-2 d-block text-center fw-bold">CAMPO OBLIGATORIO</span>
+                            )}
                         </div>
                         <div className="mb-4">
                             <textarea
                                 className="form-control py-3 px-4 text-center"
                                 placeholder="DETALLES DE LA RUTINA"
                                 rows="5"
+                                value={detalles}
+                                onChange={(e) => {
+                                    setDetalles(e.target.value);
+                                    setErrores({ ...errores, detalles: false });
+                                }}
                                 style={{
                                     borderRadius: "20px",
-                                    border: "none",
+                                    border: errores.detalles ? "2px solid red" : "none",
                                     boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
                                     fontSize: "0.9rem",
                                     fontWeight: "bold",
                                     resize: "none"
                                 }}
                             ></textarea>
+                            {errores.detalles && (
+                                <span className="text-danger small mt-2 d-block text-center fw-bold">CAMPO OBLIGATORIO</span>
+                            )}
                         </div>
                         <div className="mt-auto">
                             <button
                                 type="button"
+                                onClick={handleCrearRutina}
                                 className="btn w-100 py-3 mb-3"
                                 style={{
                                     backgroundColor: "var(--color-primario)",

@@ -1,9 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 
 export const Rutinas = () => {
     const navigate = useNavigate();
+    const [rutinas, setRutinas] = useState([]);
+
+    useEffect(() => {
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        
+        if (currentUser && currentUser.id) {
+            const storageKey = `rutinas_user_${currentUser.id}`;
+            const rutinasGuardadas = JSON.parse(localStorage.getItem(storageKey)) || [];
+            setRutinas(rutinasGuardadas);
+        } else {
+            navigate("/");
+        }
+    }, [navigate]);
 
     return (
         <div className="bg-registro">
@@ -19,13 +32,29 @@ export const Rutinas = () => {
                     <img src={logoApp} alt="Logo Baby Zzzync" style={{ width: "150px", height: "auto" }} />
                     <i className="fas fa-bars fa-lg text-white"></i>
                 </div>
-                <div className="p-4 flex-grow-1 d-flex flex-column">
+                <div className="p-4 flex-grow-1 d-flex flex-column" style={{ overflow: "hidden" }}>
                     <div className="d-flex flex-column h-100">
                         <div className="mb-4 text-center w-100">
                             <h1 className="fw-bold m-0" style={{ color: "var(--color-primario)", fontSize: "1.7rem" }}>RUTINAS</h1>
                         </div>
 
-                        <div className="flex-grow-1">
+                        <div className="flex-grow-1 mb-3" style={{ overflowY: "auto", paddingRight: "5px" }}>
+                            {rutinas.length === 0 ? (
+                                <p className="text-center text-muted mt-4">No tienes rutinas creadas.</p>
+                            ) : (
+                                rutinas.map((rutina) => (
+                                    <div key={rutina.id} className="card mb-3 shadow-sm" style={{ borderRadius: "20px", border: "none", backgroundColor: "white" }}>
+                                        <div className="card-body text-center">
+                                            <h5 className="card-title fw-bold" style={{ color: "var(--color-primario)" }}>
+                                                {rutina.nombre}
+                                            </h5>
+                                            <p className="card-text text-muted mb-0" style={{ fontSize: "0.9rem" }}>
+                                                {rutina.detalles}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
 
                         <div className="mt-auto mb-2">
