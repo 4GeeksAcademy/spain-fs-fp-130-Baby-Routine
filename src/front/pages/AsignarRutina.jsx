@@ -21,7 +21,7 @@ export const AsignarRutina = () => {
                 <div className="d-flex align-items-center justify-content-between p-3" style={{ backgroundColor: "var(--color-primario)", minHeight: "80px" }}>
                     <div 
                         style={{ width: "24px", cursor: "pointer" }} 
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate("/Menupadre")}
                     >
                         <i className="fas fa-arrow-left fa-lg text-white"></i>
                     </div>
@@ -56,7 +56,7 @@ export const AsignarRutina = () => {
                                     <button 
                                         className="btn w-100 py-3 text-uppercase fw-bold" 
                                         style={{ color: "var(--color-primario)", fontSize: "0.9rem" }}
-                                        onClick={() => { navigate("/crear-rutina"); setShowMenu(false); }}
+                                        onClick={() => { navigate("/Crear-rutina"); setShowMenu(false); }}
                                     >
                                         CREAR NUEVA RUTINA
                                     </button>

@@ -27,7 +27,6 @@ export const CrearRutina = () => {
 
         if (!nuevosErrores.nombre && !nuevosErrores.detalles) {
             const storageKey = `rutinas_user_${currentUser.id}`;
-            
             const rutinasGuardadas = JSON.parse(localStorage.getItem(storageKey)) || [];
             
             const nuevaRutina = {
@@ -39,7 +38,7 @@ export const CrearRutina = () => {
 
             localStorage.setItem(storageKey, JSON.stringify([...rutinasGuardadas, nuevaRutina]));
             
-            navigate("/rutinas"); 
+            navigate("/rutinas", { replace: true }); 
         }
     };
 
@@ -47,7 +46,12 @@ export const CrearRutina = () => {
         <div className="bg-registro">
             <div className="mobile-container">
                 <div className="d-flex align-items-center justify-content-between p-3" style={{ backgroundColor: "var(--color-primario)", minHeight: "80px" }}>
-                    <div style={{ width: "24px" }}></div>
+                    <div 
+                        style={{ width: "24px", cursor: "pointer" }}
+                        onClick={() => navigate("/rutinas")}
+                    >
+                        <i className="fas fa-arrow-left fa-lg text-white"></i>
+                    </div>
                     <img src={logoApp} alt="Logo Baby Zzzync" style={{ width: "150px", height: "auto" }} />
                     <i className="fas fa-bars fa-lg text-white" style={{ cursor: "pointer" }}></i>
                 </div>
@@ -118,7 +122,7 @@ export const CrearRutina = () => {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => navigate(-1)}
+                                onClick={() => navigate("/rutinas")}
                                 className="btn w-100 py-3"
                                 style={{
                                     backgroundColor: "white",
