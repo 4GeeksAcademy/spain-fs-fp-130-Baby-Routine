@@ -5,8 +5,8 @@ import Cloudinary from "../components/Cloudinary.jsx";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 import Swal from 'sweetalert2';
 
-export const Addhijo = () => {  
-  const { dispatch } = useGlobalReducer();
+export const Addhijo = () => {    
+  const { store, actions } = useGlobalReducer();
   const navigate = useNavigate();
 
   const [nombre, setNombre] = useState("");
@@ -15,7 +15,7 @@ export const Addhijo = () => {
   const [info, setInfo] = useState("");
   const [foto, setFoto] = useState("");
 
-  // ESTADOS PARA SWITCHES (condiciones variables)
+  // ESTADOS DE SWITCHES
   const [hasIntolerancia, setHasIntolerancia] = useState(false);
   const [hasAlergia, setHasAlergia] = useState(false);
   const [hasAsma, setHasAsma] = useState(false);
@@ -30,7 +30,8 @@ export const Addhijo = () => {
   const [gatea, setGatea] = useState(false);
   const [vaAlBano, setVaAlBano] = useState(false);
 
-  const handleSave = () => {
+  // modificacion de handleSave en asincrona para hablar con el backend
+  const handleSave = async () => {
     if (!nombre || !apellidos || edad === 0) {
         Swal.fire({
             title: '¡Ups!',
@@ -47,38 +48,51 @@ export const Addhijo = () => {
         return;
     }
 
-    dispatch({
-        type: "add_hijo",
-        payload: { 
-            id: Date.now(), 
-            nombre, 
-            apellido: apellidos, 
-            edad,
-            info,
-            fotoUrl: foto,
-            desarrollo: {
-                gatea: gatea ? "Sí" : "No",
-                autonomiaBano: vaAlBano ? "Sí" : "No"
-            },
-            datosMedicos: {
-                intolerancia: hasIntolerancia ? intolerancia : "Ninguna",
-                alergia: hasAlergia ? alergia : "Ninguna",
-                asma: hasAsma ? nivelAsma : "No",
-                tipoSangre: tipoSangre || "No informado"
-            }
+    // aqui hacemos GET del usuario logueado desde el localStorage
+    const localUserData = JSON.parse(localStorage.getItem("user"));
+    
+    // objeto del hijo
+    const hijoData = { 
+        nombre, 
+        apellido: apellidos, 
+        edad,
+        info,
+        fotoUrl: foto,
+        user_id: localUserData?.id, // Este es el ID del padre logueado / user
+        desarrollo: {
+            gatea: gatea ? "Sí" : "No",
+            autonomiaBano: vaAlBano ? "Sí" : "No"
+        },
+        datosMedicos: {
+            intolerancia: hasIntolerancia ? intolerancia : "Ninguna",
+            alergia: hasAlergia ? alergia : "Ninguna",
+            asma: hasAsma ? nivelAsma : "No",
+            tipoSangre: tipoSangre || "No informado"
         }
-    });
+    };
 
-    Swal.fire({
-        icon: 'success',
-        title: '¡Niño registrado!',
-        showConfirmButton: false,
-        timer: 1500,
-        width: '400px',
-        customClass: { popup: 'my-custom-popup' }
-    }).then(() => {
-        navigate("/menupadre");
-    });
+    // comprobacion de acción asincrona definida en actions.js 
+    const success = await actions.addHijo(hijoData);
+
+    if (success) {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Niño registrado!',
+            showConfirmButton: false,
+            timer: 1500,
+            width: '400px',
+            customClass: { popup: 'my-custom-popup' }
+        }).then(() => {
+            navigate("/menupadre");
+        });
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo guardar la información en el servidor.',
+            confirmButtonColor: 'var(--color-primario)',
+        });
+    }
   };
 
   const selectStyle = { fontSize: "0.85rem", backgroundColor: "#f8f9fa" };

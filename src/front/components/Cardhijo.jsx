@@ -3,17 +3,18 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 import Swal from 'sweetalert2';
 
 export const Cardhijo = ({ hijo }) => {
-  const { dispatch } = useGlobalReducer();
+  // Extraemos store y actions del reducer global
+  const { store, actions } = useGlobalReducer();
 
   const handleDelete = (e) => {
     e.stopPropagation(); 
 
     Swal.fire({
       title: '¿Eliminar a ' + hijo.nombre + '?',
-      text: "Esta acción no se puede deshacer.",
+      text: "Esta acción borrará al niño y a sus autorizados de forma permanente.",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: 'var(--color-descanso)', 
+      confirmButtonColor: '#ff6b6b', // Un color de advertencia
       cancelButtonColor: '#c2c2c2',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
@@ -24,23 +25,32 @@ export const Cardhijo = ({ hijo }) => {
         confirmButton: 'rounded-pill px-3 shadow-sm',
         cancelButton: 'rounded-pill px-3'
       }
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {      
-        dispatch({
-          type: "delete_hijo",
-          payload: hijo.id
-        });
+        // LLAMADA CLAVE: Usamos la acción que creamos en actions.js
+        // Esta función hace el fetch DELETE al backend y luego el dispatch al store
+        const success = await actions.deleteHijo(hijo.id);
 
-        Swal.fire({
-          title: '¡Eliminado!',
-          icon: 'success',
-          timer: 1000,
-          showConfirmButton: false,
-          width: '400px',
-          customClass: {
-            popup: 'my-custom-popup'
-          }
-        });
+        if (success) {
+          Swal.fire({
+            title: '¡Eliminado!',
+            text: 'El registro ha sido borrado de la base de datos.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+            width: '400px',
+            customClass: {
+              popup: 'my-custom-popup'
+            }
+          });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo eliminar el registro del servidor.',
+            icon: 'error',
+            confirmButtonColor: '#4CC9F0'
+          });
+        }
       }
     });
   };
@@ -87,7 +97,7 @@ export const Cardhijo = ({ hijo }) => {
           style={{ 
             top: "5px", 
             right: "5px", 
-            color: "#c2c2c2", 
+            color: "#ff6b6b", 
             background: "white",
             borderRadius: "50%",
             width: "28px",
@@ -127,7 +137,7 @@ export const Cardhijo = ({ hijo }) => {
             {hijo.nombre}
           </p>
 
-          {/*FILA DE ICONOS DE INFO MEDICA*/}
+          {/* FILA DE ICONOS DE INFO MEDICA */}
           <div className="d-flex gap-2 justify-content-center" style={{ minHeight: "18px" }}>
             {tieneIntolerancia && (
               <i className="fas fa-utensils text-warning" title="Intolerancia" style={{ fontSize: "0.75rem" }}></i>
@@ -145,7 +155,6 @@ export const Cardhijo = ({ hijo }) => {
         <div className="modal fade" id={`modalInfo-${hijo.id}`} tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content" style={{ borderRadius: "25px", border: "none" }}>
-              
               <div className="modal-body text-center pt-5">
                 <img 
                   src={hijo.fotoUrl || "https://via.placeholder.com/150"} 
@@ -162,7 +171,6 @@ export const Cardhijo = ({ hijo }) => {
                   </span>
                 </div>
 
-                {/* DATOS DE DESARROLLO */}
                 <div className="px-3 py-2 mb-2 mx-2 border" style={{ borderRadius: "15px", backgroundColor: "#fff" }}>
                   <p className="small text-uppercase fw-bold text-muted mb-2" style={{ fontSize: "0.7rem", letterSpacing: "0.5px" }}>Hitos de Desarrollo</p>
                   <div className="d-flex justify-content-around small">
@@ -171,7 +179,6 @@ export const Cardhijo = ({ hijo }) => {
                   </div>
                 </div>
 
-                {/* DATOS MEDICOS */}
                 <div className="px-3 py-3 bg-light mx-2 mb-2 text-start" style={{ borderRadius: "15px" }}>
                   <p className="small text-uppercase fw-bold text-muted mb-2 text-center" style={{ fontSize: "0.7rem" }}>Ficha Médica</p>
                   <div style={{ fontSize: "0.85rem", color: "#555" }}>
@@ -182,7 +189,6 @@ export const Cardhijo = ({ hijo }) => {
                   </div>
                 </div>
 
-                {/* NOTAS ADICIONALES */}
                 <div className="px-4 py-3 mx-2" style={{ borderRadius: "15px", border: "1px dashed #ccc" }}>
                   <p className="small text-uppercase fw-bold text-muted mb-1" style={{ fontSize: "0.7rem" }}>Notas del padre/madre</p>
                   <p className="mb-0 italic" style={{ color: "#777", fontSize: "0.85rem", fontStyle: "italic" }}>
@@ -196,7 +202,7 @@ export const Cardhijo = ({ hijo }) => {
                   type="button" 
                   className="btn px-5 py-2 text-white shadow-sm" 
                   data-bs-dismiss="modal" 
-                  style={{ backgroundColor: "var(--color-primario)", borderRadius: "12px", border: "none" }}
+                  style={{ backgroundColor: "#4CC9F0", borderRadius: "12px", border: "none" }}
                 >
                   Cerrar
                 </button>
