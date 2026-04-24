@@ -32,7 +32,8 @@ export const router = createBrowserRouter(
         <Route path="/Rutinas" element={<ProtectedRoute><Rutinas /></ProtectedRoute>} />
         <Route path="/Asignar-Rutina" element={<ProtectedRoute><AsignarRutina /></ProtectedRoute>} />
         <Route path="/Crear-rutina" element={<ProtectedRoute><CrearRutina /></ProtectedRoute>} />
-        <Route path="/familia-rutina" element={<ProtectedRoute><FamiliaRutina /></ProtectedRoute>} />
+
+        <Route path="/familia-rutina/:id" element={<ProtectedRoute><FamiliaRutina /></ProtectedRoute>} />
 
         <Route path="/Menupadre" element={<ProtectedRoute><Menupadre /></ProtectedRoute>} />
         <Route path="/addhijo" element={<ProtectedRoute><Addhijo /></ProtectedRoute>} />

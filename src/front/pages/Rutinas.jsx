@@ -48,6 +48,8 @@ export const Rutinas = () => {
                 setRutinas(nuevasRutinas);
                 localStorage.setItem(storageKey, JSON.stringify(nuevasRutinas));
 
+                localStorage.removeItem(`tasks_routine_${id}`);
+
                 Swal.fire({
                     title: "¡Eliminado!",
                     text: "La rutina ha sido borrada correctamente.",
@@ -110,13 +112,15 @@ export const Rutinas = () => {
                                                 >
                                                     ASIGNAR
                                                 </button>
+                                                
                                                 <button 
                                                     className="btn flex-grow-1 py-2 fw-bold text-white small"
                                                     style={{ backgroundColor: "var(--color-primario)", borderRadius: "15px", fontSize: "0.8rem" }}
-                                                    onClick={() => navigate("/Familia-Rutina")}
+                                                    onClick={() => navigate(`/familia-rutina/${rutina.id}`)}
                                                 >
                                                     EDITAR
                                                 </button>
+
                                                 <button 
                                                     className="btn flex-grow-1 py-2 fw-bold text-white small"
                                                     style={{ backgroundColor: "#dc3545", borderRadius: "15px", fontSize: "0.8rem" }}
