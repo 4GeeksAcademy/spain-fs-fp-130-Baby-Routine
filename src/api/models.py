@@ -93,3 +93,37 @@ class Autorizado(db.Model):
             "validoHasta": self.valido_hasta,
             "hijoId": self.hijo_id
         }
+
+class Rutina(db.Model):
+    __tablename__ = 'rutina'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(120), nullable=False)
+    detalles = db.Column(db.String(250), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    actividades = db.relationship('Actividad', backref='rutina', lazy=True, cascade="all, delete-orphan")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "detalles": self.detalles,
+            "user_id": self.user_id
+        }
+
+class Actividad(db.Model):
+    __tablename__ = 'actividad'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(250), nullable=False)
+    time = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    rutina_id = db.Column(db.Integer, db.ForeignKey('rutina.id'), nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "time": self.time,
+            "category": self.category,
+            "rutina_id": self.rutina_id
+        }

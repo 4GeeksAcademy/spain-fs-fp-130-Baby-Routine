@@ -1,8 +1,16 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 
 export const Home = () => {
+  const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   const btnStyle = {
     backgroundColor: "var(--color-fondoBotones)",
     borderRadius: "15px",
@@ -16,13 +24,52 @@ export const Home = () => {
 
   const iconStyle = { fontSize: "1.5rem", color: "var(--color-primario)" };
 
+  const dropdownStyle = {
+    position: "absolute",
+    top: "70px",
+    right: "15px",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
+    zIndex: 1000,
+    display: showMenu ? "block" : "none",
+    overflow: "hidden"
+  };
+
+  const dropdownItemStyle = {
+    padding: "12px 20px",
+    width: "100%",
+    border: "none",
+    backgroundColor: "transparent",
+    textAlign: "left",
+    fontSize: "0.9rem",
+    fontWeight: "bold",
+    cursor: "pointer",
+    borderBottom: "1px solid #f0f0f0"
+  };
+
   return (
     <div className="bg-registro">
-      <div className="mobile-container">
+      <div className="mobile-container" style={{ position: "relative" }}>
+        
         <div className="d-flex align-items-center justify-content-between p-3" style={{ backgroundColor: "var(--color-primario)", minHeight: "80px" }}>
           <div style={{ width: "24px" }}></div>
           <img src={logoApp} alt="Logo Baby Zzzync" style={{ width: "150px", height: "auto" }} />
-          <i className="fas fa-bars fa-lg text-white" style={{ cursor: "pointer" }}></i>
+          <i 
+            className="fas fa-bars fa-lg text-white" 
+            style={{ cursor: "pointer" }}
+            onClick={() => setShowMenu(!showMenu)}
+          ></i>
+        </div>
+
+        <div style={dropdownStyle}>
+          <button style={dropdownItemStyle} onClick={() => navigate("/rutinas", { state: { from: "/home" } })}>
+            <i className="fas fa-calendar-alt me-2"></i> RUTINAS
+          </button>
+          
+          <button style={{...dropdownItemStyle, borderBottom: "none", color: "red"}} onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt me-2"></i> CERRAR SESIÓN
+          </button>
         </div>
 
         <div className="d-flex flex-column gap-4 p-4">

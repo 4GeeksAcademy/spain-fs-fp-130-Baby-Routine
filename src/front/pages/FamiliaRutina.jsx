@@ -34,23 +34,13 @@ const getCategoryColor = (category) => {
 export const FamiliaRutina = () => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const apiUrl = import.meta.env.VITE_BACKEND_URL || process.env.BACKEND_URL || "http://localhost:3001";
     
     const [task, setTask] = useState("");
     const [time, setTime] = useState(dayjs());
     const [category, setCategory] = useState("");
     
-    const storageKey = `tasks_routine_${id}`;
-
-    const [list, setList] = useState(() => {
-        const savedList = localStorage.getItem(storageKey);
-        return savedList ? JSON.parse(savedList) : [];
-    });
-
-    useEffect(() => {
-        if (id) {
-            localStorage.setItem(storageKey, JSON.stringify(list));
-        }
-    }, [list, storageKey, id]);
+    const [list, setList] = useState([]);
 
     const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
     const showMessage = (msg, sev = "success") => setSnackbar({ open: true, message: msg, severity: sev });
@@ -58,6 +48,21 @@ export const FamiliaRutina = () => {
     const [openEditModal, setOpenEditModal] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [errors, setErrors] = useState({ task: false, category: false });
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (id && token) {
+            fetch(`${apiUrl}/api/rutinas/${id}/actividades`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const sortedData = data.sort((a, b) => a.time.localeCompare(b.time));
+                setList(sortedData);
+            })
+            .catch(err => console.error(err));
+        }
+    }, [id]);
 
     const counts = list.reduce((acc, item) => {
         acc[item.category] = (acc[item.category] || 0) + 1;
@@ -70,17 +75,30 @@ export const FamiliaRutina = () => {
         setErrors({ task: newTaskError, category: newCategoryError });
 
         if (!newTaskError && !newCategoryError) {
+            const token = localStorage.getItem("token");
             const nuevaActividad = {
-                id: Date.now(),
                 text: task,
                 time: time.format("HH:mm"),
                 category: category,
             };
-            const nuevaLista = [...list, nuevaActividad].sort((a, b) => a.time.localeCompare(b.time));
-            setList(nuevaLista);
-            setTask("");
-            setCategory("");
-            showMessage("Actividad añadida correctamente");
+
+            fetch(`${apiUrl}/api/rutinas/${id}/actividades`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(nuevaActividad)
+            })
+            .then(res => res.json())
+            .then(data => {
+                const nuevaLista = [...list, data].sort((a, b) => a.time.localeCompare(b.time));
+                setList(nuevaLista);
+                setTask("");
+                setCategory("");
+                showMessage("Actividad añadida correctamente");
+            })
+            .catch(err => console.error(err));
         }
     };
 
@@ -91,21 +109,47 @@ export const FamiliaRutina = () => {
 
     const handleUpdateTask = () => {
         if (editingItem.text.trim() === "") return;
-        const listaActualizada = list.map(item => {
-            if (item.id === editingItem.id) {
-                return { ...editingItem, time: editingItem.time.format("HH:mm") };
-            }
-            return item;
-        }).sort((a, b) => a.time.localeCompare(b.time));
-        setList(listaActualizada);
-        setOpenEditModal(false);
-        showMessage("Actividad actualizada");
+        const token = localStorage.getItem("token");
+
+        const updatedData = {
+            text: editingItem.text,
+            time: editingItem.time.format("HH:mm"),
+            category: editingItem.category
+        };
+
+        fetch(`${apiUrl}/api/actividades/${editingItem.id}`, {
+            method: "PUT",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            const listaActualizada = list.map(item => item.id === editingItem.id ? data : item)
+                                         .sort((a, b) => a.time.localeCompare(b.time));
+            setList(listaActualizada);
+            setOpenEditModal(false);
+            showMessage("Actividad actualizada");
+        })
+        .catch(err => console.error(err));
     };
 
     const handleDeleteFromEdit = () => {
-        setList(list.filter(item => item.id !== editingItem.id));
-        setOpenEditModal(false);
-        showMessage("Actividad eliminada", "info");
+        const token = localStorage.getItem("token");
+        fetch(`${apiUrl}/api/actividades/${editingItem.id}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(res => {
+            if(res.ok) {
+                setList(list.filter(item => item.id !== editingItem.id));
+                setOpenEditModal(false);
+                showMessage("Actividad eliminada", "info");
+            }
+        })
+        .catch(err => console.error(err));
     };
 
     return (

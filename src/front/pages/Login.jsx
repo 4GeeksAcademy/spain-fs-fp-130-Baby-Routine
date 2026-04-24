@@ -18,10 +18,14 @@ export const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
+        
+        localStorage.setItem("token", data.token); 
         localStorage.setItem("user", JSON.stringify(data.user));
+        
         navigate("/home");
       } else {
-        alert("Correo o contraseña incorrectos");
+        const errorData = await response.json();
+        alert(errorData.msg || "Correo o contraseña incorrectos");
       }
     } catch (error) {
       alert("No se pudo conectar con el servidor.");
@@ -44,7 +48,6 @@ export const Login = () => {
               <label className="form-label small fw-bold text-muted mb-1">Contraseña:</label>
               <input type="password" className="form-control rounded-3" placeholder="contraseña secreta" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
-
             <div className="mb-4 text-start">
               <Link to="/registro" className="small text-decoration-none fw-bold" style={{ color: "var(--color-descanso)" }}>
                 ¿No estás registrado?

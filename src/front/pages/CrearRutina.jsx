@@ -9,10 +9,12 @@ export const CrearRutina = () => {
     const [detalles, setDetalles] = useState("");
     const [errores, setErrores] = useState({ nombre: false, detalles: false });
 
-    const handleCrearRutina = () => {
-        const currentUser = JSON.parse(localStorage.getItem("user"));
+    const apiUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+
+    const handleCrearRutina = async () => {
+        const token = localStorage.getItem("token");
         
-        if (!currentUser || !currentUser.id) {
+        if (!token) {
             alert("Sesión no válida. Por favor, inicia sesión de nuevo.");
             navigate("/");
             return;
@@ -22,23 +24,32 @@ export const CrearRutina = () => {
             nombre: nombre.trim() === "",
             detalles: detalles.trim() === ""
         };
-
         setErrores(nuevosErrores);
 
         if (!nuevosErrores.nombre && !nuevosErrores.detalles) {
-            const storageKey = `rutinas_user_${currentUser.id}`;
-            const rutinasGuardadas = JSON.parse(localStorage.getItem(storageKey)) || [];
-            
-            const nuevaRutina = {
-                id: Date.now(),
-                userId: currentUser.id,
-                nombre: nombre,
-                detalles: detalles
-            };
+            try {
+                const response = await fetch(`${apiUrl}/api/rutinas`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        nombre: nombre,
+                        detalles: detalles
+                    })
+                });
 
-            localStorage.setItem(storageKey, JSON.stringify([...rutinasGuardadas, nuevaRutina]));
-            
-            navigate("/rutinas", { replace: true }); 
+                if (response.ok) {
+                    navigate("/rutinas", { replace: true }); 
+                } else {
+                    const errorData = await response.json();
+                    alert("Error al guardar: " + (errorData.msg || "Error del servidor"));
+                }
+            } catch (error) {
+                console.error("Error en la petición:", error);
+                alert("No se pudo conectar con el servidor.");
+            }
         }
     };
 
@@ -55,10 +66,12 @@ export const CrearRutina = () => {
                     <img src={logoApp} alt="Logo Baby Zzzync" style={{ width: "150px", height: "auto" }} />
                     <i className="fas fa-bars fa-lg text-white" style={{ cursor: "pointer" }}></i>
                 </div>
+
                 <div className="p-4 flex-grow-1 d-flex flex-column">
                     <div className="mb-4 text-center">
                         <h1 className="fw-bold" style={{ color: "var(--color-primario)", fontSize: "1.7rem" }}>NUEVA RUTINA</h1>
                     </div>
+
                     <form className="d-flex flex-column h-100 flex-grow-1" onSubmit={(e) => e.preventDefault()}>
                         <div className="mb-3">
                             <input
@@ -82,6 +95,7 @@ export const CrearRutina = () => {
                                 <span className="text-danger small mt-2 d-block text-center fw-bold">CAMPO OBLIGATORIO</span>
                             )}
                         </div>
+
                         <div className="mb-4">
                             <textarea
                                 className="form-control py-3 px-4 text-center"
@@ -105,6 +119,7 @@ export const CrearRutina = () => {
                                 <span className="text-danger small mt-2 d-block text-center fw-bold">CAMPO OBLIGATORIO</span>
                             )}
                         </div>
+
                         <div className="mt-auto">
                             <button
                                 type="button"

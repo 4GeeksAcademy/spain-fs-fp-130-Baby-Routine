@@ -1,31 +1,49 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 
 export const Rutinas = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [rutinas, setRutinas] = useState([]);
     const [activeRutinaId, setActiveRutinaId] = useState(null);
+    
+    const apiUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+
+    const handleBack = () => {
+        if (location.state && location.state.from) {
+            navigate(location.state.from);
+        } else {
+            navigate("/Asignar-Rutina");
+        }
+    };
 
     useEffect(() => {
-        const currentUser = JSON.parse(localStorage.getItem("user"));
-        
-        if (currentUser && currentUser.id) {
-            const storageKey = `rutinas_user_${currentUser.id}`;
-            const rutinasGuardadas = JSON.parse(localStorage.getItem(storageKey)) || [];
-            setRutinas(rutinasGuardadas);
-        } else {
+        const token = localStorage.getItem("token");
+        if (!token) {
             navigate("/");
+            return;
         }
+
+        fetch(`${apiUrl}/api/rutinas`, {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(res => {
+            if (res.status === 401) {
+                localStorage.removeItem("token");
+                navigate("/");
+                return;
+            }
+            return res.json();
+        })
+        .then(data => { if (data) setRutinas(data); })
+        .catch(err => console.error(err));
     }, [navigate]);
 
     const toggleMenu = (id) => {
-        if (activeRutinaId === id) {
-            setActiveRutinaId(null);
-        } else {
-            setActiveRutinaId(id);
-        }
+        setActiveRutinaId(activeRutinaId === id ? null : id);
     };
 
     const handleDelete = (id) => {
@@ -40,23 +58,18 @@ export const Rutinas = () => {
             borderRadius: "20px"
         }).then((result) => {
             if (result.isConfirmed) {
-                const currentUser = JSON.parse(localStorage.getItem("user"));
-                const storageKey = `rutinas_user_${currentUser.id}`;
-                
-                const nuevasRutinas = rutinas.filter(rutina => rutina.id !== id);
-                
-                setRutinas(nuevasRutinas);
-                localStorage.setItem(storageKey, JSON.stringify(nuevasRutinas));
-
-                localStorage.removeItem(`tasks_routine_${id}`);
-
-                Swal.fire({
-                    title: "¡Eliminado!",
-                    text: "La rutina ha sido borrada correctamente.",
-                    icon: "success",
-                    timer: 1500,
-                    showConfirmButton: false
-                });
+                const token = localStorage.getItem("token");
+                fetch(`${apiUrl}/api/rutinas/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                })
+                .then(res => {
+                    if(res.ok) {
+                        setRutinas(rutinas.filter(rutina => rutina.id !== id));
+                        Swal.fire({ title: "¡Eliminado!", icon: "success", timer: 1500, showConfirmButton: false });
+                    }
+                })
+                .catch(err => console.error("Error borrando:", err));
             }
         });
     };
@@ -67,7 +80,7 @@ export const Rutinas = () => {
                 <div className="d-flex align-items-center justify-content-between p-3" style={{ backgroundColor: "var(--color-primario)", minHeight: "80px" }}>
                     <div
                         style={{ width: "24px", cursor: "pointer" }}
-                        onClick={() => navigate("/Asignar-Rutina")}
+                        onClick={handleBack}
                     >
                         <i className="fas fa-arrow-left fa-lg text-white"></i>
                     </div>
@@ -94,40 +107,16 @@ export const Rutinas = () => {
                                             onClick={() => toggleMenu(rutina.id)}
                                         >
                                             <div className="card-body text-center">
-                                                <h5 className="card-title fw-bold mb-1" style={{ color: "var(--color-primario)" }}>
-                                                    {rutina.nombre}
-                                                </h5>
-                                                <p className="card-text text-muted mb-0 small">
-                                                    {rutina.detalles}
-                                                </p>
+                                                <h5 className="card-title fw-bold mb-1" style={{ color: "var(--color-primario)" }}>{rutina.nombre}</h5>
+                                                <p className="card-text text-muted mb-0 small">{rutina.detalles}</p>
                                             </div>
                                         </div>
 
                                         {activeRutinaId === rutina.id && (
                                             <div className="mt-2 d-flex flex-wrap gap-2 animate__animated animate__fadeIn">
-                                                <button 
-                                                    className="btn flex-grow-1 py-2 fw-bold small"
-                                                    style={{ backgroundColor: "#e9ecef", color: "var(--color-primario)", borderRadius: "15px", fontSize: "0.8rem" }}
-                                                    onClick={() => console.log("Asignar:", rutina.id)}
-                                                >
-                                                    ASIGNAR
-                                                </button>
-                                                
-                                                <button 
-                                                    className="btn flex-grow-1 py-2 fw-bold text-white small"
-                                                    style={{ backgroundColor: "var(--color-primario)", borderRadius: "15px", fontSize: "0.8rem" }}
-                                                    onClick={() => navigate(`/familia-rutina/${rutina.id}`)}
-                                                >
-                                                    EDITAR
-                                                </button>
-
-                                                <button 
-                                                    className="btn flex-grow-1 py-2 fw-bold text-white small"
-                                                    style={{ backgroundColor: "#dc3545", borderRadius: "15px", fontSize: "0.8rem" }}
-                                                    onClick={() => handleDelete(rutina.id)}
-                                                >
-                                                    ELIMINAR
-                                                </button>
+                                                <button className="btn flex-grow-1 py-2 fw-bold small" style={{ backgroundColor: "#e9ecef", color: "var(--color-primario)", borderRadius: "15px", fontSize: "0.8rem" }} onClick={() => console.log("Asignar:", rutina.id)}>ASIGNAR</button>
+                                                <button className="btn flex-grow-1 py-2 fw-bold text-white small" style={{ backgroundColor: "var(--color-primario)", borderRadius: "15px", fontSize: "0.8rem" }} onClick={() => navigate(`/familia-rutina/${rutina.id}`)}>EDITAR</button>
+                                                <button className="btn flex-grow-1 py-2 fw-bold text-white small" style={{ backgroundColor: "#dc3545", borderRadius: "15px", fontSize: "0.8rem" }} onClick={() => handleDelete(rutina.id)}>ELIMINAR</button>
                                             </div>
                                         )}
                                     </div>
@@ -138,13 +127,12 @@ export const Rutinas = () => {
                         <div className="mt-auto mb-2">
                             <button
                                 type="button"
-                                onClick={() => navigate("/Crear-rutina")}
+                                onClick={() => navigate("/Crear-rutina", { state: location.state })}
                                 className="btn w-100 py-3"
                                 style={{
                                     backgroundColor: "var(--color-primario)",
                                     color: "white",
                                     borderRadius: "50px",
-                                    border: "none",
                                     fontWeight: "bold",
                                     fontSize: "1.1rem",
                                     boxShadow: "0 4px 12px rgba(72, 12, 168, 0.3)"
