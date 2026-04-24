@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { Cardhijo } from "../components/Cardhijo.jsx";
@@ -7,8 +7,21 @@ import { Cardautorizado } from "../components/Cardautorizado.jsx";
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 
 export const Menupadre = () => {
-  const { store } = useGlobalReducer();
+  const { store, actions } = useGlobalReducer();
   const [activeTab, setActiveTab] = useState("hijos");
+
+  // EFECTO DE CARGA ROBUSTO
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    if (user && user.id) {
+      // Si el store está vacío (típico tras un refresh), pedimos datos.
+      // Comprobamos ambas listas para asegurar persistencia total.
+      if (store.hijos.length === 0 && store.autorizados.length === 0) {
+        actions.loadParentData(user.id);
+      }
+    }
+  }, [store.hijos.length, store.autorizados.length]); // Escuchamos cambios en las longitudes
 
   return (
     <div className="bg-registro min-vh-100 d-flex align-items-center justify-content-center p-2">
@@ -75,10 +88,10 @@ export const Menupadre = () => {
 
             {/* VISTA: AUTORIZADOS */}
             {activeTab === "autorizados" && (
-              <div>
+              <div className="row g-3">
                 {store.autorizados && store.autorizados.length > 0 ? (
-                  store.autorizados.map(autorizado => (
-                    <Cardautorizado key={autorizado.id} autorizado={autorizado} />
+                  store.autorizados.map(auth => (
+                    <Cardautorizado key={auth.id} autorizado={auth} />
                   ))
                 ) : (
                   <div className="text-center mt-5 text-muted">
