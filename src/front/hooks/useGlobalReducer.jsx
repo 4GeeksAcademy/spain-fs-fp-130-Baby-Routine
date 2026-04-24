@@ -13,7 +13,7 @@ export function StoreProvider({ children }) {
     // Initialize reducer with the initial state.
     const [store, dispatch] = useReducer(storeReducer, initialStore())
 
-    // Inicializamos las acciones pasando el store y el dispatch
+    
     const storeActions = actions(store, dispatch);
 
     // Provide the store and dispatch method to all child components.

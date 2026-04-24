@@ -3,7 +3,7 @@ from api.models import db, User, Hijo, Autorizado
 
 api = Blueprint('api', __name__)
 
-# --- Rutas de Usuarios ---
+# Rutas de Usuarios
 
 @api.route('/registro', methods=['POST'])
 def handle_registro():
@@ -30,7 +30,7 @@ def handle_login():
     if user is None: return jsonify({"msg": "Error"}), 401
     return jsonify({"msg": "Login exitoso", "user": user.serialize()}), 200
 
-# --- Rutas para Hijos y Autorizados ---
+# Rutas para Hijos
 
 @api.route('/hijos', methods=['POST'])
 def add_hijo():
@@ -60,16 +60,16 @@ def delete_hijo(hijo_id):
         return jsonify({"msg": "Hijo no encontrado"}), 404
     
     try:
-        # Primero borramos los autorizados asociados a ese hijo para evitar errores de integridad
+        # Borrado en cascada manual de autorizados
         Autorizado.query.filter_by(hijo_id=hijo_id).delete()
-        
-        # Luego borramos al hijo
         db.session.delete(hijo)
         db.session.commit()
         return jsonify({"msg": "Hijo y sus autorizados eliminados"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar", "error": str(e)}), 500
+
+# Rutas para Autorizados
 
 @api.route('/autorizados', methods=['POST'])
 def add_autorizado():
@@ -91,12 +91,30 @@ def add_autorizado():
         db.session.rollback()
         return jsonify({"msg": "Error", "error": str(e)}), 500
 
+@api.route('/autorizados/<int:auth_id>', methods=['DELETE'])
+def delete_autorizado(auth_id):
+    """Ruta para eliminar un autorizado específico de la base de datos"""
+    auth = Autorizado.query.get(auth_id)
+    if not auth:
+        return jsonify({"msg": "Autorizado no encontrado"}), 404
+    
+    try:
+        db.session.delete(auth)
+        db.session.commit()
+        return jsonify({"msg": "Autorizado eliminado correctamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar", "error": str(e)}), 500
+
+# Rutas de user
+
 @api.route('/parent-data/<int:user_id>', methods=['GET'])
 def get_parent_data(user_id):    
     user = User.query.get(user_id)
     if not user: return jsonify({"msg": "Usuario no encontrado"}), 404
         
     hijos = Hijo.query.filter_by(user_id=user_id).all()
+    # Consulta join para traer solo los autorizados vinculados a los hijos de este usuario
     autorizados = db.session.query(Autorizado).join(Hijo).filter(Hijo.user_id == user_id).all()
 
     return jsonify({

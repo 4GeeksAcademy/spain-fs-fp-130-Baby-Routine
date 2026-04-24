@@ -3,9 +3,8 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 import Swal from 'sweetalert2';
 
 export const Cardautorizado = ({ autorizado }) => {
-  const { store, dispatch } = useGlobalReducer();
+  const { store, actions } = useGlobalReducer(); 
 
-  // Buscamos los datos del hijo vinculado usando el hijoId guardado
   const hijoVinculado = store.hijos?.find(h => h.id === autorizado.hijoId);
 
   const handleDelete = (e) => {
@@ -13,7 +12,7 @@ export const Cardautorizado = ({ autorizado }) => {
 
     Swal.fire({
       title: '¿Eliminar?',
-      text: `Se borrará la autorización de ${autorizado.nombre}.`,
+      text: `Se borrará la autorización de ${autorizado.nombre} permanentemente.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: 'var(--color-descanso)', 
@@ -26,23 +25,28 @@ export const Cardautorizado = ({ autorizado }) => {
         confirmButton: 'rounded-pill px-3 shadow-sm',
         cancelButton: 'rounded-pill px-3'
       }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch({
-          type: "delete_autorizado",
-          payload: autorizado.id
-        });
+    }).then(async (result) => { 
+      if (result.isConfirmed) {        
+       
+        const success = await actions.deleteAutorizado(autorizado.id);
 
-        Swal.fire({
-          title: 'Eliminado',
-          icon: 'success',
-          timer: 1000,
-          showConfirmButton: false,
-          width: '280px',
-          customClass: {
-            popup: 'my-custom-popup'
-          }
-        });
+        if (success) {
+          Swal.fire({
+            title: 'Eliminado',
+            text: 'Registro de autorizado borrado.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+            width: '280px',
+            customClass: { popup: 'my-custom-popup' }
+          });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo eliminar el registro del servidor.',
+            icon: 'error'
+          });
+        }
       }
     });
   };
@@ -57,9 +61,9 @@ export const Cardautorizado = ({ autorizado }) => {
         <button 
           onClick={handleDelete}
           className="btn btn-sm position-absolute" 
-          style={{ top: "5px", right: "5px", color: "#c2c2c2", background: "transparent", border: "none", zIndex: 10 }}
+          style={{ top: "10px", right: "10px", color: "#c2c2c2", background: "transparent", border: "none", zIndex: 10 }}
         >
-          <i className="fas fa-times" style={{ fontSize: "0.8rem" }}></i>
+          <i className="fas fa-times" style={{ fontSize: "1rem" }}></i>
         </button>
 
         <div className="card-body d-flex align-items-center p-3">
@@ -78,7 +82,6 @@ export const Cardautorizado = ({ autorizado }) => {
                 {autorizado.nombre} {autorizado.apellidos}
             </h6>
             
-            {/* Se ve a quien recoge en la Card */}
             <p className="mb-1 text-primary fw-bold" style={{ fontSize: "0.7rem" }}>
               <i className="fas fa-child me-1"></i> 
               Recoge a: {hijoVinculado ? hijoVinculado.nombre : "Hijo no encontrado"}
@@ -118,7 +121,6 @@ export const Cardautorizado = ({ autorizado }) => {
                 <p className="text-muted small mb-3">{autorizado.apellidos}</p>
                 
                 <div className="text-start">
-                    {/* INFO DEL NIÑO EN EL MODAL */}
                     <div className="mb-2 border-bottom pb-1 bg-primary-subtle p-2 rounded-2">
                         <label className="text-primary d-block mb-0" style={{ fontSize: "0.65rem", fontWeight: "bold" }}>AUTORIZADO PARA RECOGER A:</label>
                         <span className="fw-bold" style={{ color: "#0d6efd", fontSize: "0.9rem" }}>
@@ -126,25 +128,21 @@ export const Cardautorizado = ({ autorizado }) => {
                         </span>
                     </div>
 
-                    {/* DNI */}
                     <div className="mb-2 border-bottom pb-1">
                         <label className="text-muted d-block mb-0" style={{ fontSize: "0.65rem", fontWeight: "bold" }}>DNI / NIE</label>
                         <span style={{ color: "#444", fontSize: "0.85rem" }}>{autorizado.dni}</span>
                     </div>
 
-                    {/* TELÉFONO */}
                     <div className="mb-2 border-bottom pb-1">
                         <label className="text-muted d-block mb-0" style={{ fontSize: "0.65rem", fontWeight: "bold" }}>TELÉFONO</label>
                         <span style={{ color: "#444", fontSize: "0.85rem" }}>{autorizado.telefono}</span>
                     </div>
 
-                    {/* PARENTESCO */}
                     <div className="mb-2 border-bottom pb-1">
                         <label className="text-muted d-block mb-0" style={{ fontSize: "0.65rem", fontWeight: "bold" }}>PARENTESCO</label>
                         <span style={{ color: "#444", fontSize: "0.85rem" }}>{autorizado.parentesco || "Autorizado"}</span>
                     </div>
 
-                    {/* RANGO DE FECHAS */}
                     <div className="bg-light p-2 rounded-3 mt-3 shadow-sm border">
                         <label className="text-muted d-block text-center mb-1" style={{ fontSize: "0.6rem", fontWeight: "bold", textTransform: "uppercase" }}>Validez del Permiso</label>
                         

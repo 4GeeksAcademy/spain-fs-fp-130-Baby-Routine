@@ -36,18 +36,17 @@ export const actions = (store, dispatch) => {
             }
         },
 
-        // ELIMINAR HIJO (Permanente en BD)
+        // Eliminar hijo
         deleteHijo: async (hijoId) => {
             try {
                 const resp = await fetch(`${backendUrl}/api/hijos/${hijoId}`, {
                     method: "DELETE"
                 });
                 
-                if (resp.ok) {
-                    // Si el borrado en el servidor fue exitoso, actualizamos el store
+                if (resp.ok) {                    
                     dispatch({ type: 'delete_hijo', payload: hijoId });
                     
-                    // Opcional: Recargamos datos de autorizados por si se borraron en cascada
+                    
                     const user = JSON.parse(localStorage.getItem("user"));
                     if (user) {
                         const respData = await fetch(`${backendUrl}/api/parent-data/${user.id}`);
@@ -79,6 +78,24 @@ export const actions = (store, dispatch) => {
                 return false;
             } catch (error) {
                 console.error("Error al añadir autorizado:", error);
+                return false;
+            }
+        },
+
+        // Eliminar autorizado
+        deleteAutorizado: async (authId) => {
+            try {
+                const resp = await fetch(`${backendUrl}/api/autorizados/${authId}`, {
+                    method: "DELETE"
+                });
+                
+                if (resp.ok) {                    
+                    dispatch({ type: 'delete_autorizado', payload: authId });
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error("Error eliminando autorizado:", error);
                 return false;
             }
         }

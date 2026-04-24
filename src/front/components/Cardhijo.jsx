@@ -2,8 +2,7 @@ import React from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer"; 
 import Swal from 'sweetalert2';
 
-export const Cardhijo = ({ hijo }) => {
-  // Extraemos store y actions del reducer global
+export const Cardhijo = ({ hijo }) => {  
   const { store, actions } = useGlobalReducer();
 
   const handleDelete = (e) => {
@@ -14,7 +13,7 @@ export const Cardhijo = ({ hijo }) => {
       text: "Esta acción borrará al niño y a sus autorizados de forma permanente.",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#ff6b6b', // Un color de advertencia
+      confirmButtonColor: '#ff6b6b', 
       cancelButtonColor: '#c2c2c2',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
@@ -26,15 +25,14 @@ export const Cardhijo = ({ hijo }) => {
         cancelButton: 'rounded-pill px-3'
       }
     }).then(async (result) => {
-      if (result.isConfirmed) {      
-        // LLAMADA CLAVE: Usamos la acción que creamos en actions.js
-        // Esta función hace el fetch DELETE al backend y luego el dispatch al store
+      if (result.isConfirmed) {   
+        
         const success = await actions.deleteHijo(hijo.id);
 
         if (success) {
           Swal.fire({
             title: '¡Eliminado!',
-            text: 'El registro ha sido borrado de la base de datos.',
+            text: 'El registro ha sido borrado.',
             icon: 'success',
             timer: 1500,
             showConfirmButton: false,
@@ -55,7 +53,7 @@ export const Cardhijo = ({ hijo }) => {
     });
   };
 
-  // LOGICA DE ICONOS DINAMICOS EN CARD
+  // logica de iconos en card
   const tieneIntolerancia = hijo.datosMedicos?.intolerancia && hijo.datosMedicos.intolerancia !== "Ninguna";
   const tieneAlergia = hijo.datosMedicos?.alergia && hijo.datosMedicos.alergia !== "Ninguna";
   const tieneAsma = hijo.datosMedicos?.asma && hijo.datosMedicos.asma !== "No";

@@ -20,7 +20,6 @@ export default function storeReducer(store, action) {
         hijos: [...store.hijos, action.payload]
       };
 
-    // CORRECCIÓN: Caso para eliminar el hijo del estado global
     case 'delete_hijo':
       return {
         ...store,
@@ -38,6 +37,14 @@ export default function storeReducer(store, action) {
         ...store,
         autorizados: [...store.autorizados, action.payload]
       };
+
+    
+    case 'delete_autorizado':
+      return {
+        ...store,
+        autorizados: store.autorizados.filter(auth => auth.id !== action.payload)
+      };
+    
 
     case 'set_user':
       return {
