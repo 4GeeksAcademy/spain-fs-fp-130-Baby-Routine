@@ -184,23 +184,27 @@ def handle_actividades(rutina_id):
     rutina = Rutina.query.filter_by(id=rutina_id, user_id=current_user_id).first()
     
     if not rutina:
-        return jsonify({"msg": "Rutina no encontrada"}), 404
+        return jsonify({"msg": "Rutina no encontrada o no tienes permiso"}), 404
 
     if request.method == 'GET':
         actividades = Actividad.query.filter_by(rutina_id=rutina_id).all()
         return jsonify([a.serialize() for a in actividades]), 200
 
     if request.method == 'POST':
-        body = request.get_json()
-        nueva_actividad = Actividad(
-            text=body.get("text"),
-            time=body.get("time"),
-            category=body.get("category"),
-            rutina_id=rutina_id
-        )
-        db.session.add(nueva_actividad)
-        db.session.commit()
-        return jsonify(nueva_actividad.serialize()), 201
+        try:
+            body = request.get_json()
+            nueva_actividad = Actividad(
+                text=body.get("text"),
+                time=body.get("time"),
+                category=body.get("category"),
+                rutina_id=rutina_id
+            )
+            db.session.add(nueva_actividad)
+            db.session.commit()
+            return jsonify(nueva_actividad.serialize()), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"msg": "Error al crear actividad", "error": str(e)}), 500
 
 @api.route('/actividades/<int:actividad_id>', methods=['PUT', 'DELETE'])
 @jwt_required()
