@@ -17,27 +17,29 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { AsignarRutina } from "./pages/AsignarRutina.jsx";
 import { Rutinas } from "./pages/Rutinas.jsx";
 import { CrearRutina } from "./pages/CrearRutina.jsx";
+import { DetalleRutinaHijo } from "./pages/DetalleRutinaHijo.jsx"; 
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
+        
+        <Route index element={<Login />} />
+        <Route path="registro" element={<Registro />} />
 
-        <Route path="/" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
-
-        <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/single/:theId" element={<ProtectedRoute><Single /></ProtectedRoute>} />
-        <Route path="/demo" element={<ProtectedRoute><Demo /></ProtectedRoute>} />
-
-        <Route path="/Rutinas" element={<ProtectedRoute><Rutinas /></ProtectedRoute>} />
-        <Route path="/Asignar-Rutina" element={<ProtectedRoute><AsignarRutina /></ProtectedRoute>} />
-        <Route path="/Crear-rutina" element={<ProtectedRoute><CrearRutina /></ProtectedRoute>} />
-
-        <Route path="/familia-rutina/:id" element={<ProtectedRoute><FamiliaRutina /></ProtectedRoute>} />
-
-        <Route path="/Menupadre" element={<ProtectedRoute><Menupadre /></ProtectedRoute>} />
-        <Route path="/addhijo" element={<ProtectedRoute><Addhijo /></ProtectedRoute>} />
-        <Route path="/add-autorizado" element={<ProtectedRoute><AddAutorizado /></ProtectedRoute>} />
+        <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="rutinas" element={<ProtectedRoute><Rutinas /></ProtectedRoute>} />
+        <Route path="crear-rutina" element={<ProtectedRoute><CrearRutina /></ProtectedRoute>} />
+        <Route path="asignar-rutina" element={<ProtectedRoute><AsignarRutina /></ProtectedRoute>} />
+        
+        <Route path="detalle-rutina-hijo/:id" element={<ProtectedRoute><DetalleRutinaHijo /></ProtectedRoute>} />
+        
+        <Route path="familia-rutina/:id" element={<ProtectedRoute><FamiliaRutina /></ProtectedRoute>} />
+        <Route path="menupadre" element={<ProtectedRoute><Menupadre /></ProtectedRoute>} />
+        <Route path="addhijo" element={<ProtectedRoute><Addhijo /></ProtectedRoute>} />
+        <Route path="add-autorizado" element={<ProtectedRoute><AddAutorizado /></ProtectedRoute>} />
+        
+        <Route path="single/:theId" element={<ProtectedRoute><Single /></ProtectedRoute>} />
+        <Route path="demo" element={<ProtectedRoute><Demo /></ProtectedRoute>} />
         
       </Route>
     )

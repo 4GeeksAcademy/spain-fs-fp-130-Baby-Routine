@@ -2,14 +2,12 @@ import React, { useState } from "react";
 import logoApp from "../assets/Logo Baby Zzync 1.png";
 import { Link, useNavigate } from "react-router-dom";
 import Cloudinary from "../components/Cloudinary";
-import Autocomplete from "react-google-autocomplete";
 import GoogleInput from "../components/GoogleInput";
 
 export const Registro = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [validated, setValidated] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -65,7 +63,7 @@ export const Registro = () => {
       });
 
       if (response.ok) {
-        setShowModal(true);
+        navigate("/"); 
       } else {
         const data = await response.json();
         alert(data.msg || "Error al registrar la cuenta");
@@ -76,14 +74,8 @@ export const Registro = () => {
     }
   };
 
-  const handleConfirmar = () => {
-    setShowModal(false);
-    navigate("/");
-  };
-
   return (
-    <div className="bg-registro">
-      <div className="mobile-container p-4">
+    <div className="w-100 p-4">
         <div className="text-center mb-3">
           <img src={logoApp} alt="Logo" style={{ width: "180px" }} />
         </div>
@@ -193,30 +185,6 @@ export const Registro = () => {
           
           <button type="submit" className="btn w-100 py-2 mt-2 mb-4" style={{ backgroundColor: "var(--color-primario)", color: "white", borderRadius: "50px", border: "none" }}>Crear Cuenta</button>
         </form>
-      </div>
-
-      {showModal && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
-          backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", 
-          alignItems: "center", zIndex: 1000, padding: "20px"
-        }}>
-          <div style={{
-            backgroundColor: "white", padding: "30px", borderRadius: "20px", 
-            textAlign: "center", maxWidth: "400px", width: "100%", boxShadow: "0 4px 15px rgba(0,0,0,0.2)"
-          }}>
-            <i className="fas fa-check-circle mb-3" style={{ fontSize: "50px", color: "var(--color-primario)" }}></i>
-            <h4 className="fw-bold mb-3">La cuenta ha sido creada con éxito</h4>
-            <button 
-              onClick={handleConfirmar}
-              className="btn w-100 py-2" 
-              style={{ backgroundColor: "var(--color-primario)", color: "white", borderRadius: "50px", border: "none" }}
-            >
-              Confirmar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -2,6 +2,11 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+asignacion_rutina = db.Table('asignacion_rutina',
+    db.Column('hijo_id', db.Integer, db.ForeignKey('hijo.id'), primary_key=True),
+    db.Column('rutina_id', db.Integer, db.ForeignKey('rutina.id'), primary_key=True)
+)
+
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +49,7 @@ class Hijo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     autorizados = db.relationship('Autorizado', backref='hijo', lazy=True)
+    rutinas = db.relationship('Rutina', secondary=asignacion_rutina, backref=db.backref('hijos_asignados', lazy='dynamic'))
 
     def serialize(self):
         return {
@@ -92,4 +98,38 @@ class Autorizado(db.Model):
             "validoDesde": self.valido_desde,
             "validoHasta": self.valido_hasta,
             "hijoId": self.hijo_id
+        }
+
+class Rutina(db.Model):
+    __tablename__ = 'rutina'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(120), nullable=False)
+    detalles = db.Column(db.String(250), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    actividades = db.relationship('Actividad', backref='rutina', lazy=True, cascade="all, delete-orphan")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "detalles": self.detalles,
+            "user_id": self.user_id
+        }
+
+class Actividad(db.Model):
+    __tablename__ = 'actividad'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(250), nullable=False)
+    time = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    rutina_id = db.Column(db.Integer, db.ForeignKey('rutina.id'), nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "time": self.time,
+            "category": self.category,
+            "rutina_id": self.rutina_id
         }
