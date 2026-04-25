@@ -17,6 +17,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { AsignarRutina } from "./pages/AsignarRutina.jsx";
 import { Rutinas } from "./pages/Rutinas.jsx";
 import { CrearRutina } from "./pages/CrearRutina.jsx";
+import { DetalleRutinaHijo } from "./pages/DetalleRutinaHijo.jsx"; 
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -29,6 +30,8 @@ export const router = createBrowserRouter(
         <Route path="rutinas" element={<ProtectedRoute><Rutinas /></ProtectedRoute>} />
         <Route path="crear-rutina" element={<ProtectedRoute><CrearRutina /></ProtectedRoute>} />
         <Route path="asignar-rutina" element={<ProtectedRoute><AsignarRutina /></ProtectedRoute>} />
+        
+        <Route path="detalle-rutina-hijo/:id" element={<ProtectedRoute><DetalleRutinaHijo /></ProtectedRoute>} />
         
         <Route path="familia-rutina/:id" element={<ProtectedRoute><FamiliaRutina /></ProtectedRoute>} />
         <Route path="menupadre" element={<ProtectedRoute><Menupadre /></ProtectedRoute>} />

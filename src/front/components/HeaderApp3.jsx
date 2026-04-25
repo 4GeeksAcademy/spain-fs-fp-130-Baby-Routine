@@ -12,6 +12,14 @@ export const HeaderApp3 = ({ showBackButton = false, onBackClick }) => {
         navigate("/");
     };
 
+    const handleBack = () => {
+        if (onBackClick) {
+            onBackClick();
+        } else {
+            navigate(-1);
+        }
+    };
+
     const dropdownStyle = {
         position: "absolute",
         top: "70px",
@@ -46,17 +54,11 @@ export const HeaderApp3 = ({ showBackButton = false, onBackClick }) => {
             }}
         >
             <div style={{ width: "40px", flexShrink: 0 }}>
-                {showBackButton ? (
+                {showBackButton && (
                     <i
                         className="fas fa-arrow-left fa-lg text-white"
                         style={{ cursor: "pointer" }}
-                        onClick={onBackClick}
-                    ></i>
-                ) : (
-                    <i 
-                        className="fas fa-arrow-left fa-lg text-white" 
-                        style={{ cursor: "pointer" }}
-                        onClick={() => navigate("/Menupadre")}
+                        onClick={handleBack}
                     ></i>
                 )}
             </div>

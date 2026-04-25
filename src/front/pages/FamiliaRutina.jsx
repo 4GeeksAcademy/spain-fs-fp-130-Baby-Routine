@@ -123,7 +123,7 @@ export const FamiliaRutina = () => {
 
     return (
         <div className="w-100 h-100 d-flex flex-column bg-white">
-            <HeaderApp4 showBackButton={true} onBackClick={() => navigate("/rutinas")} />
+            <HeaderApp4 showBackButton={true} onBackClick={() => navigate("/rutinas", { replace: true })} />
 
             <div className="flex-grow-1 overflow-auto p-3">
                 <div className="bg-light p-3 rounded-4 mb-4 shadow-sm border">

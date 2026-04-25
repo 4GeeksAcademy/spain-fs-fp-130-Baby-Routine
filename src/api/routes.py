@@ -106,7 +106,6 @@ def add_autorizado():
 
 @api.route('/autorizados/<int:auth_id>', methods=['DELETE'])
 def delete_autorizado(auth_id):
-    """Ruta para eliminar un autorizado específico de la base de datos"""
     auth = Autorizado.query.get(auth_id)
     if not auth:
         return jsonify({"msg": "Autorizado no encontrado"}), 404
@@ -119,37 +118,20 @@ def delete_autorizado(auth_id):
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar", "error": str(e)}), 500
 
-# Rutas de user
-
-@api.route('/parent-data/<int:user_id>', methods=['GET'])
-def get_parent_data(user_id):    
-    user = User.query.get(user_id)
-    if not user: return jsonify({"msg": "Usuario no encontrado"}), 404
-        
-    hijos = Hijo.query.filter_by(user_id=user_id).all()
-    # Consulta join para traer solo los autorizados vinculados a los hijos de este usuario
-    autorizados = db.session.query(Autorizado).join(Hijo).filter(Hijo.user_id == user_id).all()
-
-    return jsonify({
-        "hijos": [h.serialize() for h in hijos],
-        "autorizados": [a.serialize() for a in autorizados]
-    }), 200
+# Rutas de Rutinas y Asignación
 
 @api.route('/rutinas', methods=['GET', 'POST'])
 @jwt_required()
 def handle_rutinas():
     current_user_id = get_jwt_identity()
-
     try:
         if request.method == 'GET':
             rutinas = Rutina.query.filter_by(user_id=current_user_id).all()
             return jsonify([r.serialize() for r in rutinas]), 200
-
         if request.method == 'POST':
             body = request.get_json()
             if not body or not body.get("nombre"):
                 return jsonify({"msg": "El nombre es obligatorio"}), 400
-                
             nueva_rutina = Rutina(
                 nombre=body.get("nombre"),
                 detalles=body.get("detalles", ""),
@@ -158,31 +140,61 @@ def handle_rutinas():
             db.session.add(nueva_rutina)
             db.session.commit()
             return jsonify(nueva_rutina.serialize()), 201
-            
     except Exception as e:
         db.session.rollback()
-        print(f"Error en /rutinas: {str(e)}")
-        return jsonify({"msg": "Error interno del servidor", "error": str(e)}), 500
+        return jsonify({"msg": "Error", "error": str(e)}), 500
+
+@api.route('/asignar-rutina', methods=['POST'])
+@jwt_required()
+def asignar_rutina_a_hijos_modal():
+    body = request.get_json()
+    rutina_id = body.get("rutina_id")
+    hijos_ids = body.get("hijo_ids")
+
+    if not rutina_id or not hijos_ids:
+        return jsonify({"msg": "Datos insuficientes"}), 400
+
+    rutina = Rutina.query.get(rutina_id)
+    if not rutina:
+        return jsonify({"msg": "Rutina no encontrada"}), 404
+    
+    hijos = Hijo.query.filter(Hijo.id.in_(hijos_ids)).all()
+    
+    rutina.hijos_asignados = hijos
+    
+    try:
+        db.session.commit()
+        return jsonify({"msg": "Asignación exitosa"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error", "error": str(e)}), 500
+
+@api.route('/hijos/<int:hijo_id>/rutinas', methods=['GET'])
+@jwt_required()
+def get_rutinas_de_hijo(hijo_id):
+    hijo = Hijo.query.get(hijo_id)
+    if not hijo:
+        return jsonify({"msg": "Hijo no encontrado"}), 404
+    return jsonify([r.serialize() for r in hijo.rutinas]), 200
 
 @api.route('/rutinas/<int:rutina_id>', methods=['DELETE'])
 @jwt_required()
 def delete_rutina(rutina_id):
     current_user_id = get_jwt_identity()
     rutina = Rutina.query.filter_by(id=rutina_id, user_id=current_user_id).first()
-    
     if not rutina:
         return jsonify({"msg": "Rutina no encontrada o no autorizada"}), 404
-
     db.session.delete(rutina)
     db.session.commit()
     return jsonify({"msg": "Rutina eliminada"}), 200
+
+# Rutas de Actividades
 
 @api.route('/rutinas/<int:rutina_id>/actividades', methods=['GET', 'POST'])
 @jwt_required()
 def handle_actividades(rutina_id):
     current_user_id = get_jwt_identity()
     rutina = Rutina.query.filter_by(id=rutina_id, user_id=current_user_id).first()
-    
     if not rutina:
         return jsonify({"msg": "Rutina no encontrada o no tienes permiso"}), 404
 
@@ -225,3 +237,18 @@ def update_delete_actividad(actividad_id):
         db.session.delete(actividad)
         db.session.commit()
         return jsonify({"msg": "Actividad eliminada"}), 200
+
+# Rutas de Usuario y Datos Combinados
+
+@api.route('/parent-data/<int:user_id>', methods=['GET'])
+def get_parent_data(user_id):    
+    user = User.query.get(user_id)
+    if not user: return jsonify({"msg": "Usuario no encontrado"}), 404
+        
+    hijos = Hijo.query.filter_by(user_id=user_id).all()
+    autorizados = db.session.query(Autorizado).join(Hijo).filter(Hijo.user_id == user_id).all()
+
+    return jsonify({
+        "hijos": [h.serialize() for h in hijos],
+        "autorizados": [a.serialize() for a in autorizados]
+    }), 200

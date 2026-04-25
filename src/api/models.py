@@ -2,6 +2,11 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+asignacion_rutina = db.Table('asignacion_rutina',
+    db.Column('hijo_id', db.Integer, db.ForeignKey('hijo.id'), primary_key=True),
+    db.Column('rutina_id', db.Integer, db.ForeignKey('rutina.id'), primary_key=True)
+)
+
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +49,7 @@ class Hijo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     autorizados = db.relationship('Autorizado', backref='hijo', lazy=True)
+    rutinas = db.relationship('Rutina', secondary=asignacion_rutina, backref=db.backref('hijos_asignados', lazy='dynamic'))
 
     def serialize(self):
         return {
