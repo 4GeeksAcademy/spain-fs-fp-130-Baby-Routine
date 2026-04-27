@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { HeaderApp4 } from "../components/HeaderApp4";
+import Swal from 'sweetalert2';
 
 const getCategoryIcon = (category) => {
     switch (category) {
@@ -29,7 +30,9 @@ export const DetalleRutinaHijo = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [actividades, setActividades] = useState([]);
-    const { rutina, hijo } = location.state || {};
+    
+     
+    const { rutina, hijo, esCuidador } = location.state || {};
     const apiUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
     useEffect(() => {
@@ -45,11 +48,69 @@ export const DetalleRutinaHijo = () => {
         });
     }, [id, apiUrl]);
 
+    const handleSendRoutine = async () => {
+        const { value: email } = await Swal.fire({
+            title: 'Compartir Rutina',
+            text: `Introduce el email del cuidador para compartir la rutina de ${hijo?.nombre}`,
+            input: 'email',
+            inputPlaceholder: 'email@ejemplo.com',
+            showCancelButton: true,
+            confirmButtonText: 'Enviar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: 'var(--color-primario)',
+            cancelButtonColor: '#aaa',
+            customClass: {
+                popup: 'rounded-4 shadow',
+                confirmButton: 'rounded-pill px-4',
+                cancelButton: 'rounded-pill px-4'
+            }
+        });
+
+        if (email) {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await fetch(`${apiUrl}/api/rutinas/compartir`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        rutina_id: id,
+                        hijo_id: hijo?.id
+                    })
+                });
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Rutina compartida!',
+                        text: `Se ha enviado la información a ${email}`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.msg || 'No se pudo compartir');
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hubo un problema',
+                    text: error.message,
+                    confirmButtonColor: 'var(--color-primario)'
+                });
+            }
+        }
+    };
+
     return (
         <div className="w-100 h-100 d-flex flex-column bg-white">
             <HeaderApp4 
                 showBackButton={true} 
-                onBackClick={() => navigate("/menupadre", { replace: true })} 
+                
+                onBackClick={() => navigate(-1)} 
             />
             
             <div className="p-4 flex-grow-1 overflow-auto">
@@ -60,7 +121,7 @@ export const DetalleRutinaHijo = () => {
                     </span>
                 </div>
 
-                <div className="d-flex flex-column gap-2">
+                <div className="d-flex flex-column gap-2 mb-4">
                     {actividades.length === 0 ? (
                         <p className="text-center text-muted mt-4">No hay tareas en esta rutina.</p>
                     ) : (
@@ -79,6 +140,20 @@ export const DetalleRutinaHijo = () => {
                         ))
                     )}
                 </div>
+
+                {/* botonde enviar rutina, solo se muestra si NO es cuidador */}
+                {!esCuidador && (
+                    <div className="mt-auto pt-3 pb-2">
+                        <button 
+                            className="btn w-100 rounded-pill shadow-sm text-white fw-bold py-3"
+                            style={{ backgroundColor: "var(--color-primario)", border: "none" }}
+                            onClick={handleSendRoutine}
+                        >
+                            <i className="fas fa-paper-plane me-2"></i>
+                            ENVIAR RUTINA
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

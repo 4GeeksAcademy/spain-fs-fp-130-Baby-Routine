@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint
-from api.models import db, User, Hijo, Autorizado, Rutina, Actividad
+from api.models import db, User, Hijo, Autorizado, Rutina, Actividad, RutinaCompartida
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 
 api = Blueprint('api', __name__)
@@ -43,7 +43,7 @@ def handle_registro():
         return jsonify({"msg": "Error", "error": str(e)}), 500
 
 
-# Rutas para Hijos
+# --- RUTAS PARA HIJOS ---
 
 @api.route('/hijos', methods=['POST'])
 def add_hijo():
@@ -67,22 +67,32 @@ def add_hijo():
         return jsonify({"msg": "Error", "error": str(e)}), 500
 
 @api.route('/hijos/<int:hijo_id>', methods=['DELETE'])
+@jwt_required()
 def delete_hijo(hijo_id):
     hijo = Hijo.query.get(hijo_id)
     if not hijo:
         return jsonify({"msg": "Hijo no encontrado"}), 404
     
     try:
-        # Borrado en cascada manual de autorizados
+        # 1. Eliminar referencias en RutinaCompartida (Cuidadores)
+        RutinaCompartida.query.filter_by(hijo_id=hijo_id).delete()
+        
+        # 2. Eliminar autorizados
         Autorizado.query.filter_by(hijo_id=hijo_id).delete()
+        
+        # 3. Limpiar relación Muchos a Muchos con Rutinas
+        hijo.rutinas = [] 
+        
+        # 4. Eliminar al hijo definitivamente
         db.session.delete(hijo)
         db.session.commit()
-        return jsonify({"msg": "Hijo y sus autorizados eliminados"}), 200
+        return jsonify({"msg": "Hijo y datos vinculados eliminados con éxito"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar", "error": str(e)}), 500
 
-# Rutas para Autorizados
+
+# --- RUTAS PARA AUTORIZADOS ---
 
 @api.route('/autorizados', methods=['POST'])
 def add_autorizado():
@@ -118,7 +128,8 @@ def delete_autorizado(auth_id):
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar", "error": str(e)}), 500
 
-# Rutas de Rutinas y Asignación
+
+# --- RUTAS DE RUTINAS ---
 
 @api.route('/rutinas', methods=['GET', 'POST'])
 @jwt_required()
@@ -159,7 +170,6 @@ def asignar_rutina_a_hijos_modal():
         return jsonify({"msg": "Rutina no encontrada"}), 404
     
     hijos = Hijo.query.filter(Hijo.id.in_(hijos_ids)).all()
-    
     rutina.hijos_asignados = hijos
     
     try:
@@ -183,12 +193,13 @@ def delete_rutina(rutina_id):
     current_user_id = get_jwt_identity()
     rutina = Rutina.query.filter_by(id=rutina_id, user_id=current_user_id).first()
     if not rutina:
-        return jsonify({"msg": "Rutina no encontrada o no autorizada"}), 404
+        return jsonify({"msg": "Rutina no encontrada"}), 404
     db.session.delete(rutina)
     db.session.commit()
     return jsonify({"msg": "Rutina eliminada"}), 200
 
-# Rutas de Actividades
+
+# --- RUTAS DE ACTIVIDADES ---
 
 @api.route('/rutinas/<int:rutina_id>/actividades', methods=['GET', 'POST'])
 @jwt_required()
@@ -196,7 +207,7 @@ def handle_actividades(rutina_id):
     current_user_id = get_jwt_identity()
     rutina = Rutina.query.filter_by(id=rutina_id, user_id=current_user_id).first()
     if not rutina:
-        return jsonify({"msg": "Rutina no encontrada o no tienes permiso"}), 404
+        return jsonify({"msg": "Rutina no encontrada"}), 404
 
     if request.method == 'GET':
         actividades = Actividad.query.filter_by(rutina_id=rutina_id).all()
@@ -238,17 +249,77 @@ def update_delete_actividad(actividad_id):
         db.session.commit()
         return jsonify({"msg": "Actividad eliminada"}), 200
 
-# Rutas de Usuario y Datos Combinados
+
+# --- OTRAS RUTAS ---
 
 @api.route('/parent-data/<int:user_id>', methods=['GET'])
 def get_parent_data(user_id):    
     user = User.query.get(user_id)
     if not user: return jsonify({"msg": "Usuario no encontrado"}), 404
-        
     hijos = Hijo.query.filter_by(user_id=user_id).all()
     autorizados = db.session.query(Autorizado).join(Hijo).filter(Hijo.user_id == user_id).all()
-
     return jsonify({
         "hijos": [h.serialize() for h in hijos],
         "autorizados": [a.serialize() for a in autorizados]
     }), 200
+
+@api.route('/rutinas/compartir', methods=['POST'])
+@jwt_required()
+def compartir_rutina():
+    body = request.get_json()
+    email_cuidador = body.get("email")
+    rutina_id = body.get("rutina_id")
+    hijo_id = body.get("hijo_id")
+
+    cuidador = User.query.filter_by(email=email_cuidador).first()
+    if not cuidador:
+        return jsonify({"msg": "El correo no pertenece a ningún usuario registrado"}), 404
+
+    existe = RutinaCompartida.query.filter_by(
+        cuidador_id=cuidador.id, 
+        rutina_id=rutina_id, 
+        hijo_id=hijo_id
+    ).first()
+    
+    if existe:
+        return jsonify({"msg": "Esta rutina ya ha sido compartida con este usuario"}), 400
+
+    nueva_asignacion = RutinaCompartida(
+        cuidador_id=cuidador.id,
+        rutina_id=rutina_id,
+        hijo_id=hijo_id
+    )
+
+    try:
+        db.session.add(nueva_asignacion)
+        db.session.commit()
+        return jsonify({"msg": "Rutina compartida con éxito"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al compartir", "error": str(e)}), 500
+
+@api.route('/cuidador/rutinas', methods=['GET'])
+@jwt_required()
+def get_rutinas_cuidador():
+    current_user_id = get_jwt_identity()
+    asignaciones = RutinaCompartida.query.filter_by(cuidador_id=current_user_id).all()
+    return jsonify([asignacion.serialize() for asignacion in asignaciones]), 200
+
+@api.route('/cuidador/rutinas/<int:asignacion_id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_rutina_compartida(asignacion_id):
+    current_user_id = get_jwt_identity()
+    
+    # Buscamos la asignación y verificamos que pertenezca al cuidador actual
+    asignacion = RutinaCompartida.query.filter_by(id=asignacion_id, cuidador_id=current_user_id).first()
+    
+    if not asignacion:
+        return jsonify({"msg": "No se encontró la asignación o no tienes permiso"}), 404
+    
+    try:
+        db.session.delete(asignacion)
+        db.session.commit()
+        return jsonify({"msg": "Ya no tienes acceso a esta rutina"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar la asignación", "error": str(e)}), 500

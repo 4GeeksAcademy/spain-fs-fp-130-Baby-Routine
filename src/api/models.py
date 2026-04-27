@@ -133,3 +133,25 @@ class Actividad(db.Model):
             "category": self.category,
             "rutina_id": self.rutina_id
         }
+
+# Tabla para compartir rutina con cuidadores
+
+class RutinaCompartida(db.Model):
+    __tablename__ = 'rutina_compartida'
+    id = db.Column(db.Integer, primary_key=True)
+    cuidador_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    rutina_id = db.Column(db.Integer, db.ForeignKey('rutina.id'), nullable=False)
+    hijo_id = db.Column(db.Integer, db.ForeignKey('hijo.id'), nullable=False)
+
+    
+    cuidador = db.relationship('User', foreign_keys=[cuidador_id])
+    rutina_rel = db.relationship('Rutina')
+    hijo_rel = db.relationship('Hijo')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "rutina": self.rutina_rel.serialize(),
+            "hijo": self.hijo_rel.serialize(),
+            "cuidador": self.cuidador.serialize()
+        }
