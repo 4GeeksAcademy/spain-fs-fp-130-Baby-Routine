@@ -11,13 +11,8 @@ export const Menupadre = () => {
   const [activeTab, setActiveTab] = useState("hijos");
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user && user.id) {
-      if (store.hijos.length === 0 && store.autorizados.length === 0) {
-        actions.loadParentData(user.id);
-      }
-    }
-  }, [store.hijos.length, store.autorizados.length]);
+    actions.loadParentData();
+  }, []);
 
   return (
     <div className="w-100 h-100 d-flex flex-column bg-white">
