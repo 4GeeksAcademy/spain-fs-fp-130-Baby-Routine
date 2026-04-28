@@ -2,10 +2,20 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export const actions = (store, dispatch) => {
     return {
-        // Carga inicial de datos (Hijos y Autorizados)
-        loadParentData: async (userId) => {
+        loadParentData: async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
             try {
-                const resp = await fetch(`${backendUrl}/api/parent-data/${userId}`);
+
+                const resp = await fetch(`${backendUrl}/api/parent-data`, {
+                    method: "GET",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}` 
+                    }
+                });
+
                 if (!resp.ok) throw new Error("Error cargando datos");
                 const data = await resp.json();
                 
@@ -16,12 +26,15 @@ export const actions = (store, dispatch) => {
             }
         },
 
-        // Añadir un nuevo hijo
         addHijo: async (hijoData) => {
+            const token = localStorage.getItem("token");
             try {
                 const resp = await fetch(`${backendUrl}/api/hijos`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
                     body: JSON.stringify(hijoData)
                 });
                 if (resp.ok) {
@@ -50,13 +63,12 @@ export const actions = (store, dispatch) => {
                 if (resp.ok) {                    
                     dispatch({ type: 'delete_hijo', payload: hijoId });
                     
-                    const user = JSON.parse(localStorage.getItem("user"));
-                    if (user) {
-                        const respData = await fetch(`${backendUrl}/api/parent-data/${user.id}`);
-                        if (respData.ok) {
-                            const data = await respData.json();
-                            dispatch({ type: 'set_autorizados', payload: data.autorizados });
-                        }
+                    const respData = await fetch(`${backendUrl}/api/parent-data`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                    if (respData.ok) {
+                        const data = await respData.json();
+                        dispatch({ type: 'set_autorizados', payload: data.autorizados });
                     }
                     return true;
                 }
@@ -72,10 +84,14 @@ export const actions = (store, dispatch) => {
 
         // Añadir un nuevo autorizado
         addAutorizado: async (authData) => {
+            const token = localStorage.getItem("token");
             try {
                 const resp = await fetch(`${backendUrl}/api/autorizados`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
                     body: JSON.stringify(authData)
                 });
                 if (resp.ok) {
@@ -92,9 +108,13 @@ export const actions = (store, dispatch) => {
 
         // Eliminar autorizado
         deleteAutorizado: async (authId) => {
+            const token = localStorage.getItem("token");
             try {
                 const resp = await fetch(`${backendUrl}/api/autorizados/${authId}`, {
-                    method: "DELETE"
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
                 });
                 
                 if (resp.ok) {                    
@@ -108,7 +128,6 @@ export const actions = (store, dispatch) => {
             }
         },
 
-        // Eliminar rutina compartida dese la Vista del Cuidador
         deleteRutinaCompartida: async (asignacionId) => {
             const token = localStorage.getItem("token");
             try {
@@ -120,7 +139,6 @@ export const actions = (store, dispatch) => {
                 });
                 
                 if (resp.ok) {
-                    
                     return true;
                 }
                 

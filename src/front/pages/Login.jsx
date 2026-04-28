@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom"; 
+import useGlobalReducer from "../hooks/useGlobalReducer"; 
 import logoApp from "../assets/Logo Baby Zzync 1 - vers blanca.png";
 
 export const Login = () => {
+  const { store, actions, dispatch } = useGlobalReducer(); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -18,14 +20,21 @@ export const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
+        
         localStorage.setItem("token", data.token); 
         localStorage.setItem("user", JSON.stringify(data.user));
+        
+        dispatch({ type: 'set_user', payload: data.user });
+        
+        await actions.loadParentData();
+        
         navigate("/home");
       } else {
         const errorData = await response.json();
         alert(errorData.msg || "Correo o contraseña incorrectos");
       }
     } catch (error) {
+      console.error("Error en login:", error);
       alert("No se pudo conectar con el servidor.");
     }
   };

@@ -27,36 +27,59 @@ def handle_login():
 @api.route('/registro', methods=['POST'])
 def handle_registro():
     body = request.get_json()
-    if body is None: return jsonify({"msg": "No se recibió información"}), 400
+    if body is None: 
+        return jsonify({"msg": "No se recibió información"}), 400
+    
+    user_exists = User.query.filter_by(email=body.get('email')).first()
+    if user_exists:
+        return jsonify({"msg": "El correo electrónico ya está registrado"}), 400
+
     nuevo_usuario = User(
-        email=body['email'], password=body['password'], nombre=body['nombre'],
-        apellidos=body['apellidos'], edad=body['edad'], direccion_hogar=body.get('direccionHogar'),
-        direccion_trabajo=body.get('direccionTrabajo'), telefono=body.get('telefonoCompleto'),
-        foto_perfil=body.get('fotoPerfil'), is_active=True
+        email=body.get('email'),
+        password=body.get('password'),
+        nombre=body.get('nombre'),
+        apellidos=body.get('apellidos'),
+        edad=body.get('edad'),
+        direccion_hogar=body.get('direccionHogar'),
+        direccion_trabajo=body.get('direccionTrabajo'),
+        telefono=body.get('telefonoCompleto'),
+        foto_perfil=body.get('fotoPerfil'),
+        is_active=True
     )
+
     db.session.add(nuevo_usuario)
     try:
         db.session.commit()
         return jsonify({"msg": "Usuario creado con éxito"}), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"msg": "Error", "error": str(e)}), 500
+        print(f"Error en servidor: {str(e)}") # Esto saldrá en tu terminal de Python
+        return jsonify({"msg": "Error interno del servidor", "error": str(e)}), 500
 
 
 # --- RUTAS PARA HIJOS ---
 
 @api.route('/hijos', methods=['POST'])
+@jwt_required()
 def add_hijo():
+    current_user_id = get_jwt_identity()
     body = request.get_json()    
     datos_medicos = body.get("datosMedicos", {})
     desarrollo = body.get("desarrollo", {})
+    
     nuevo_hijo = Hijo(
-        nombre=body['nombre'], apellido=body['apellido'], edad=body['edad'],
-        foto_url=body.get('fotoUrl'), info_adicional=body.get('info'),        
-        intolerancia=datos_medicos.get('intolerancia'), alergia=datos_medicos.get('alergia'),
-        asma=datos_medicos.get('asma'), tipo_sangre=datos_medicos.get('tipoSangre'),       
-        gatea=desarrollo.get('gatea'), autonomia_bano=desarrollo.get('autonomiaBano'),
-        user_id=body['user_id']
+        nombre=body['nombre'], 
+        apellido=body['apellido'], 
+        edad=body['edad'],
+        foto_url=body.get('fotoUrl'), 
+        info_adicional=body.get('info'),        
+        intolerancia=datos_medicos.get('intolerancia'), 
+        alergia=datos_medicos.get('alergia'),
+        asma=datos_medicos.get('asma'), 
+        tipo_sangre=datos_medicos.get('tipoSangre'),       
+        gatea=desarrollo.get('gatea'), 
+        autonomia_bano=desarrollo.get('autonomiaBano'),
+        user_id=current_user_id # Asignamos el ID del usuario autenticado
     )
     db.session.add(nuevo_hijo)
     try:
@@ -69,9 +92,11 @@ def add_hijo():
 @api.route('/hijos/<int:hijo_id>', methods=['DELETE'])
 @jwt_required()
 def delete_hijo(hijo_id):
-    hijo = Hijo.query.get(hijo_id)
+    current_user_id = get_jwt_identity()
+    hijo = Hijo.query.filter_by(id=hijo_id, user_id=current_user_id).first()
+    
     if not hijo:
-        return jsonify({"msg": "Hijo no encontrado"}), 404
+        return jsonify({"msg": "Hijo no encontrado o no tienes permiso"}), 404
     
     try:
         # 1. Eliminar referencias en RutinaCompartida (Cuidadores)
@@ -95,6 +120,7 @@ def delete_hijo(hijo_id):
 # --- RUTAS PARA AUTORIZADOS ---
 
 @api.route('/autorizados', methods=['POST'])
+@jwt_required()
 def add_autorizado():
     body = request.get_json()
     h_id = body.get('hijoId') or body.get('hijo_id')
@@ -115,6 +141,7 @@ def add_autorizado():
         return jsonify({"msg": "Error", "error": str(e)}), 500
 
 @api.route('/autorizados/<int:auth_id>', methods=['DELETE'])
+@jwt_required()
 def delete_autorizado(auth_id):
     auth = Autorizado.query.get(auth_id)
     if not auth:
@@ -250,14 +277,17 @@ def update_delete_actividad(actividad_id):
         return jsonify({"msg": "Actividad eliminada"}), 200
 
 
-# --- OTRAS RUTAS ---
 
-@api.route('/parent-data/<int:user_id>', methods=['GET'])
-def get_parent_data(user_id):    
-    user = User.query.get(user_id)
+@api.route('/parent-data', methods=['GET'])
+@jwt_required()
+def get_parent_data():    
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     if not user: return jsonify({"msg": "Usuario no encontrado"}), 404
-    hijos = Hijo.query.filter_by(user_id=user_id).all()
-    autorizados = db.session.query(Autorizado).join(Hijo).filter(Hijo.user_id == user_id).all()
+    
+    hijos = Hijo.query.filter_by(user_id=current_user_id).all()
+    autorizados = db.session.query(Autorizado).join(Hijo).filter(Hijo.user_id == current_user_id).all()
+    
     return jsonify({
         "hijos": [h.serialize() for h in hijos],
         "autorizados": [a.serialize() for a in autorizados]
@@ -309,8 +339,6 @@ def get_rutinas_cuidador():
 @jwt_required()
 def eliminar_rutina_compartida(asignacion_id):
     current_user_id = get_jwt_identity()
-    
-    # Buscamos la asignación y verificamos que pertenezca al cuidador actual
     asignacion = RutinaCompartida.query.filter_by(id=asignacion_id, cuidador_id=current_user_id).first()
     
     if not asignacion:
