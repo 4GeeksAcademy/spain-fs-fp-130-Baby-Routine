@@ -80,7 +80,7 @@ export const HeaderApp4 = ({ showBackButton = false, onBackClick }) => {
                         navigate("/home");
                     }}
                 >
-                    <i className="fas fa-home me-2"></i> MENU
+                    <i className="fas fa-home me-2"></i> HOME
                 </button>
 
                 <button 
