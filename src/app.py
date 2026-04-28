@@ -10,6 +10,8 @@ from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 
+static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
+
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
@@ -36,9 +38,19 @@ app.register_blueprint(api, url_prefix='/api')
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
-@app.route('/')
+@app.route('/sitemap')
 def sitemap():
     return generate_sitemap(app)
+
+@app.route('/')
+def index():
+    return send_from_directory(static_file_dir, 'index.html')
+
+@app.route('/<path:path>', methods=['GET'])
+def serve_any_other_file(path):
+    if not os.path.isfile(os.path.join(static_file_dir, path)):
+        path = 'index.html'
+    return send_from_directory(static_file_dir, path)
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
