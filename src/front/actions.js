@@ -49,7 +49,6 @@ export const actions = (store, dispatch) => {
             }
         },
 
-        // Eliminar hijo 
         deleteHijo: async (hijoId) => {
             const token = localStorage.getItem("token");
             try {
@@ -82,7 +81,6 @@ export const actions = (store, dispatch) => {
             }
         },
 
-        // Añadir un nuevo autorizado
         addAutorizado: async (authData) => {
             const token = localStorage.getItem("token");
             try {
@@ -106,7 +104,6 @@ export const actions = (store, dispatch) => {
             }
         },
 
-        // Eliminar autorizado
         deleteAutorizado: async (authId) => {
             const token = localStorage.getItem("token");
             try {

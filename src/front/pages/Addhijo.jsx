@@ -15,22 +15,18 @@ export const Addhijo = () => {
   const [info, setInfo] = useState("");
   const [foto, setFoto] = useState("");
 
-  // ESTADOS DE SWITCHES
   const [hasIntolerancia, setHasIntolerancia] = useState(false);
   const [hasAlergia, setHasAlergia] = useState(false);
   const [hasAsma, setHasAsma] = useState(false);
 
-  // ESTADOS VALORES MEDICOS
   const [intolerancia, setIntolerancia] = useState("");
   const [alergia, setAlergia] = useState("");
   const [nivelAsma, setNivelAsma] = useState("");
   const [tipoSangre, setTipoSangre] = useState(""); 
 
-  // ESTADOS DESARROLLO
   const [gatea, setGatea] = useState(false);
   const [vaAlBano, setVaAlBano] = useState(false);
 
-  // modificacion de handleSave en asincrona para hablar con el backend
   const handleSave = async () => {
     if (!nombre || !apellidos || edad === 0) {
         Swal.fire({
@@ -48,17 +44,15 @@ export const Addhijo = () => {
         return;
     }
 
-    // aqui hacemos GET del usuario logueado desde el localStorage
     const localUserData = JSON.parse(localStorage.getItem("user"));
     
-    // objeto del hijo
     const hijoData = { 
         nombre, 
         apellido: apellidos, 
         edad,
         info,
         fotoUrl: foto,
-        user_id: localUserData?.id, // Este es el ID del padre logueado / user
+        user_id: localUserData?.id,
         desarrollo: {
             gatea: gatea ? "Sí" : "No",
             autonomiaBano: vaAlBano ? "Sí" : "No"
@@ -71,7 +65,6 @@ export const Addhijo = () => {
         }
     };
 
-    // comprobacion de acción asincrona definida en actions.js 
     const success = await actions.addHijo(hijoData);
 
     if (success) {
@@ -128,7 +121,6 @@ export const Addhijo = () => {
               onChange={e => setApellidos(e.target.value)} 
             />
             
-            {/* Selector de Edad */}
             <label className="small text-muted mt-2">Edad de tu peque</label>
             <div className="input-group rounded-pill overflow-hidden border shadow-sm">
               <button className="btn btn-light border-0" onClick={() => setEdad(Math.max(0, edad - 1))}>
@@ -145,11 +137,9 @@ export const Addhijo = () => {
               </button>
             </div>
 
-            {/* Apartado de información médica */}
             <div className="text-start mt-3 p-2 bg-light rounded-4">
               <p className="small fw-bold text-muted mb-3 text-center">Información Médica Especial</p>
 
-              {/* Intolerancias */}
               <div className="mb-3 px-2">
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="small text-muted">Intolerancias</span>
@@ -168,7 +158,6 @@ export const Addhijo = () => {
                 )}
               </div>
 
-              {/* Alergias */}
               <div className="mb-3 px-2">
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="small text-muted">Alergias</span>
@@ -188,7 +177,6 @@ export const Addhijo = () => {
                 )}
               </div>
 
-              {/* Asma */}
               <div className="mb-3 px-2">
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="small text-muted">¿Asmático/a?</span>
@@ -206,7 +194,6 @@ export const Addhijo = () => {
                 )}
               </div>
 
-              {/* Grupo Sanguíneo */}
               <div className="mb-2 px-2 pb-2">
                 <span className="small text-muted d-block mb-1">Grupo Sanguíneo</span>
                 <select 
@@ -224,7 +211,6 @@ export const Addhijo = () => {
               </div>
             </div>
 
-            {/* Apartado de desarrollo */}
             <div className="text-start mt-3 p-3 border rounded-4 bg-white shadow-sm">
               <p className="small fw-bold text-muted mb-2 text-center">Hitos de Desarrollo</p>
               

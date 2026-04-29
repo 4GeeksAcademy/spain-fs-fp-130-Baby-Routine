@@ -134,8 +134,6 @@ class Actividad(db.Model):
             "rutina_id": self.rutina_id
         }
 
-# Tabla para compartir rutina con cuidadores
-
 class RutinaCompartida(db.Model):
     __tablename__ = 'rutina_compartida'
     id = db.Column(db.Integer, primary_key=True)

@@ -22,7 +22,6 @@ export const Carduser = () => {
     <div className="d-flex align-items-center p-2 mb-4 shadow-sm" 
          style={{ borderRadius: "50px", backgroundColor: "#fbfbfb", border: "1px solid #eee" }}>
       
-      {/* Avatar del Usuario */}
       <div className="d-flex align-items-center justify-content-center shadow-sm" 
            style={avatarStyle}>
         {userData.fotoUrl ? (
@@ -32,7 +31,6 @@ export const Carduser = () => {
         )}
       </div>
 
-      {/* Nombre del Usuario */}
       <div className="ms-3">
         <p className="m-0 fw-bold" style={{ color: "#555", fontSize: "1rem" }}>
           {userData.nombre}

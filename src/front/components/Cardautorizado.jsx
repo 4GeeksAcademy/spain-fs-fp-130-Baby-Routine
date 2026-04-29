@@ -57,7 +57,6 @@ export const Cardautorizado = ({ autorizado }) => {
         className="card border-0 shadow-sm position-relative" 
         style={{ borderRadius: "15px", backgroundColor: "#fff", border: "1px solid #f0f0f0" }}
       >
-        {/* BOTON ELIMINAR */}
         <button 
           onClick={handleDelete}
           className="btn btn-sm position-absolute" 
@@ -67,7 +66,6 @@ export const Cardautorizado = ({ autorizado }) => {
         </button>
 
         <div className="card-body d-flex align-items-center p-3">
-          {/* Avatar */}
           <div className="me-3 shadow-sm" style={{ width: "50px", height: "50px", borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "2px solid white" }}>
             <img 
               src={autorizado.fotoUrl || "https://via.placeholder.com/150"} 
@@ -76,7 +74,6 @@ export const Cardautorizado = ({ autorizado }) => {
             />
           </div>
           
-          {/* Info Principal */}
           <div className="flex-grow-1">
             <h6 className="mb-0 fw-bold" style={{ fontSize: "0.9rem", color: "#333" }}>
                 {autorizado.nombre} {autorizado.apellidos}
@@ -92,7 +89,6 @@ export const Cardautorizado = ({ autorizado }) => {
               {autorizado.esPermanente && <span className="ms-2 badge rounded-pill bg-success-subtle text-success border border-success-subtle" style={{fontSize: "0.6rem"}}>Permanente</span>}
             </p>
             
-            {/* BOTON INFO */}
             <button 
               className="btn btn-sm p-0 d-flex align-items-center" 
               data-bs-toggle="modal" 
@@ -104,7 +100,6 @@ export const Cardautorizado = ({ autorizado }) => {
           </div>
         </div>
 
-        {/* MODAL DE INFORMACION */}
         <div className="modal fade" id={`modalAuth-${autorizado.id}`} tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-dialog-centered modal-sm">
             <div className="modal-content" style={{ borderRadius: "20px", border: "none" }}>

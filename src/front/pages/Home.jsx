@@ -23,7 +23,6 @@ export const Home = () => {
       <HeaderApp showBackButton={false} />
 
       <div className="d-flex flex-column gap-4 p-4">
-        {/* BOTÓN MI FAMILIA */}
         <Link to="/Menupadre" style={{ textDecoration: "none" }}> 
           <button className="btn w-100 shadow-sm" style={btnStyle}>
             <i className="fas fa-users mb-2" style={iconStyle}></i>
@@ -32,7 +31,6 @@ export const Home = () => {
           </button>
         </Link>
 
-        {/* BOTÓN CUIDADOR/A - Ahora vinculado a VistaCuidador */}
         <Link to="/vistacuidador" style={{ textDecoration: "none" }}>
           <button className="btn w-100 shadow-sm" style={btnStyle}>
             <i className="fas fa-user-friends mb-2" style={iconStyle}></i>
@@ -41,7 +39,6 @@ export const Home = () => {
           </button>
         </Link>
 
-        {/* BOTÓN ZZZYNC */}
         <button className="btn w-100 shadow-sm" style={btnStyle}>
           <i className="fas fa-baby mb-2" style={iconStyle}></i>
           <h5 className="m-0 fw-bold text-dark">ZZZYNC</h5>

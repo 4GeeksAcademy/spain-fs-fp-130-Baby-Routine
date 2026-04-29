@@ -122,7 +122,6 @@ export const VistaCuidador = () => {
                                         <button 
                                             className="btn btn-sm rounded-pill text-white px-3"
                                             style={{ backgroundColor: "var(--color-primario)" }}
-                                            // ACTUALIZADO: Ahora pasamos esCuidador: true en el state
                                             onClick={() => navigate(`/detalle-rutina-hijo/${item.rutina.id}`, { 
                                                 state: { 
                                                     rutina: item.rutina, 

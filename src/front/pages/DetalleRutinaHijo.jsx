@@ -141,7 +141,6 @@ export const DetalleRutinaHijo = () => {
                     )}
                 </div>
 
-                {/* botonde enviar rutina, solo se muestra si NO es cuidador */}
                 {!esCuidador && (
                     <div className="mt-auto pt-3 pb-2">
                         <button 

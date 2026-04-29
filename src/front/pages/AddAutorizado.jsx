@@ -9,7 +9,6 @@ export const AddAutorizado = () => {
   const { store, actions } = useGlobalReducer(); 
   const navigate = useNavigate();
 
-  // Estados para capturar información
   const [nombre, setNombre] = useState("");
   const [apellidos, setApellidos] = useState(""); 
   const [telefono, setTelefono] = useState("");
@@ -30,7 +29,6 @@ export const AddAutorizado = () => {
   };
 
   const handleSave = async () => {
-    // Validación logica
     const fechasValidas = esPermanente ? true : (fechaInicio && fechaFin);
 
     if (!nombre || !apellidos || !telefono || !dni || !parentesco || !hijoId || !fechasValidas) {
@@ -44,7 +42,6 @@ export const AddAutorizado = () => {
         return;
     }
     
-    // Objeto para enviar a backend
     const nuevoAutorizado = { 
         nombre, 
         apellidos, 

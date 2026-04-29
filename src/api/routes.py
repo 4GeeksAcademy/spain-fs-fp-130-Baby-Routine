@@ -53,11 +53,8 @@ def handle_registro():
         return jsonify({"msg": "Usuario creado con éxito"}), 201
     except Exception as e:
         db.session.rollback()
-        print(f"Error en servidor: {str(e)}") # Esto saldrá en tu terminal de Python
+        print(f"Error en servidor: {str(e)}")
         return jsonify({"msg": "Error interno del servidor", "error": str(e)}), 500
-
-
-# --- RUTAS PARA HIJOS ---
 
 @api.route('/hijos', methods=['POST'])
 @jwt_required()
@@ -79,7 +76,7 @@ def add_hijo():
         tipo_sangre=datos_medicos.get('tipoSangre'),       
         gatea=desarrollo.get('gatea'), 
         autonomia_bano=desarrollo.get('autonomiaBano'),
-        user_id=current_user_id # Asignamos el ID del usuario autenticado
+        user_id=current_user_id
     )
     db.session.add(nuevo_hijo)
     try:
@@ -99,25 +96,18 @@ def delete_hijo(hijo_id):
         return jsonify({"msg": "Hijo no encontrado o no tienes permiso"}), 404
     
     try:
-        # 1. Eliminar referencias en RutinaCompartida (Cuidadores)
         RutinaCompartida.query.filter_by(hijo_id=hijo_id).delete()
         
-        # 2. Eliminar autorizados
         Autorizado.query.filter_by(hijo_id=hijo_id).delete()
         
-        # 3. Limpiar relación Muchos a Muchos con Rutinas
         hijo.rutinas = [] 
         
-        # 4. Eliminar al hijo definitivamente
         db.session.delete(hijo)
         db.session.commit()
         return jsonify({"msg": "Hijo y datos vinculados eliminados con éxito"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar", "error": str(e)}), 500
-
-
-# --- RUTAS PARA AUTORIZADOS ---
 
 @api.route('/autorizados', methods=['POST'])
 @jwt_required()
@@ -154,9 +144,6 @@ def delete_autorizado(auth_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar", "error": str(e)}), 500
-
-
-# --- RUTAS DE RUTINAS ---
 
 @api.route('/rutinas', methods=['GET', 'POST'])
 @jwt_required()

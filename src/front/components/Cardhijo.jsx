@@ -106,7 +106,6 @@ export const Cardhijo = ({ hijo }) => {
           </div>
         </div>
 
-        {/* MODAL DE INFORMACION */}
         <div className="modal fade" id={`modalInfo-${hijo.id}`} tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content" style={{ borderRadius: "25px", border: "none" }}>
